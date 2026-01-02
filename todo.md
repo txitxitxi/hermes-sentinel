@@ -84,3 +84,12 @@
 - [x] Update filter creation/edit forms to include the switch
 - [x] Add Switch component with Bell icon and clear description
 - [ ] Test notification with notifyAllRestocks enabled
+
+## Bug Fix: Broken Navigation and Missing Admin Panel
+- [x] Investigate DashboardLayout navigation configuration
+- [x] Fix sidebar showing "Page 1" and "Page 2" instead of proper labels
+- [x] Restore proper menuItems: Dashboard, Monitoring, Product Filters, Restock History, Subscription
+- [x] Add adminMenuItems with Admin Panel (only visible to admin users)
+- [x] Add role-based rendering for admin menu items
+- [x] Import missing icons (Filter, History, CreditCard, Shield)
+- [x] Verify all navigation links work correctly
