@@ -168,3 +168,19 @@
 - [x] Fix clearScanLogs mutation to refetch correct query (changed from refetchScanLogs to refetch)
 - [x] Test Clear History button deletes all logs successfully (verified with SQL query, UI updates after server restart)
 - [x] Test manual scan works with corrected Chromium path (verified: 24 products detected, scan completed successfully)
+
+## Bug: Clear History Button Not Deleting Logs
+
+- [x] Investigate why clearScanLogs mutation doesn't delete records from database (backend works, Safari-specific frontend issue)
+- [ ] Check if mutation is being called correctly from frontend (window.confirm() not triggering in Safari)
+- [x] Fix database deletion logic in clearScanLogs mutation (backend mutation works correctly)
+- [ ] Test Clear History button successfully removes all logs (needs alternative to window.confirm for Safari compatibility)
+
+## Bug: Restock History Showing Product IDs Instead of Names
+- [x] Update getRestockHistory query to join products table (getRecentRestockHistory now joins products)
+- [x] Display product name instead of "Product ID: X" (History.tsx updated to show productName)
+- [x] Test Restock History page shows actual product names (verified working)
+
+## Remaining Issues
+- [ ] Fix Clear History button Safari compatibility (window.confirm not working, needs alternative UI approach)
+- [ ] Update Dashboard Recent Restock Activity to show product names (needs same fix as History page)

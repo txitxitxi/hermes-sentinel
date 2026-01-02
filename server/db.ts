@@ -229,13 +229,23 @@ export async function getAvailableProductsByRegion(regionId: number, limit = 50)
 }
 
 // Restock history queries
-export async function getRecentRestockHistory(limit = 100): Promise<RestockHistory[]> {
+export async function getRecentRestockHistory(limit = 100) {
   const db = await getDb();
   if (!db) return [];
 
   return db
-    .select()
+    .select({
+      id: restockHistory.id,
+      productId: restockHistory.productId,
+      productName: products.name,
+      price: restockHistory.price,
+      detectedAt: restockHistory.detectedAt,
+      wasNotified: restockHistory.wasNotified,
+      notificationCount: restockHistory.notificationCount,
+      createdAt: restockHistory.createdAt,
+    })
     .from(restockHistory)
+    .leftJoin(products, eq(restockHistory.productId, products.id))
     .orderBy(desc(restockHistory.detectedAt))
     .limit(limit);
 }

@@ -301,8 +301,20 @@ export default function AdminPanel() {
                 size="sm"
                 variant="destructive"
                 onClick={() => {
-                  if (confirm('Are you sure you want to clear all monitoring logs? This action cannot be undone.')) {
-                    clearScanLogs.mutate();
+                  console.log('[AdminPanel] Clear History button clicked');
+                  if (window.confirm('Are you sure you want to clear all monitoring logs? This action cannot be undone.')) {
+                    console.log('[AdminPanel] User confirmed, calling clearScanLogs.mutate()');
+                    clearScanLogs.mutate(undefined, {
+                      onSuccess: () => {
+                        console.log('[AdminPanel] clearScanLogs mutation succeeded');
+                        refetchMonitoringLogs();
+                      },
+                      onError: (error: any) => {
+                        console.error('[AdminPanel] clearScanLogs mutation failed:', error);
+                      }
+                    });
+                  } else {
+                    console.log('[AdminPanel] User cancelled');
                   }
                 }}
                 disabled={clearScanLogs.isPending}

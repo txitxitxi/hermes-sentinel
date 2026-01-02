@@ -95,7 +95,7 @@ export default function History() {
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <Package className="h-4 w-4 text-primary" />
-                        <p className="font-medium">Product ID: {restock.productId}</p>
+                        <p className="font-medium">{restock.productName || `Product ID: ${restock.productId}`}</p>
                       </div>
                       <p className="text-sm text-muted-foreground">
                         Detected: {new Date(restock.detectedAt).toLocaleString()}
