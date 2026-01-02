@@ -1,0 +1,25 @@
+{
+  "query": "\nSELECT s.*, sp.name as plan_name, sp.max_regions, sp.max_products\nFROM subscriptions s\nLEFT JOIN subscription_plans sp ON s.plan_id = sp.id\nWHERE s.user_id = 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute \nSELECT s.*, sp.name as plan_name, sp.max_regions, sp.max_products\nFROM subscriptions s\nLEFT JOIN subscription_plans sp ON s.plan_id = sp.id\nWHERE s.user_id = 1;\n",
+  "rows": [
+    {
+      "id": "1",
+      "user_id": "1",
+      "plan_id": "5",
+      "status": "active",
+      "start_date": "2026-01-02 05:08:22",
+      "end_date": "2038-01-19 03:14:07",
+      "auto_renew": "0",
+      "payment_id": "NULL",
+      "created_at": "2026-01-02 05:08:22",
+      "updated_at": "2026-01-02 05:08:22",
+      "plan_name": "NULL",
+      "max_regions": "NULL",
+      "max_products": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuser_id\tplan_id\tstatus\tstart_date\tend_date\tauto_renew\tpayment_id\tcreated_at\tupdated_at\tplan_name\tmax_regions\tmax_products\n1\t1\t5\tactive\t2026-01-02 05:08:22\t2038-01-19 03:14:07\t0\tNULL\t2026-01-02 05:08:22\t2026-01-02 05:08:22\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

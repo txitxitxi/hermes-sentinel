@@ -1,0 +1,18 @@
+{
+  "query": "\nSELECT s.id, s.user_id, s.status, s.start_date, s.end_date, sp.name as plan_name\nFROM subscriptions s\nLEFT JOIN subscription_plans sp ON s.plan_id = sp.id\nWHERE s.user_id = 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute \nSELECT s.id, s.user_id, s.status, s.start_date, s.end_date, sp.name as plan_name\nFROM subscriptions s\nLEFT JOIN subscription_plans sp ON s.plan_id = sp.id\nWHERE s.user_id = 1;\n",
+  "rows": [
+    {
+      "id": "1",
+      "user_id": "1",
+      "status": "active",
+      "start_date": "2026-01-02 05:08:22",
+      "end_date": "2038-01-19 03:14:07",
+      "plan_name": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuser_id\tstatus\tstart_date\tend_date\tplan_name\n1\t1\tactive\t2026-01-02 05:08:22\t2038-01-19 03:14:07\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 139
+}

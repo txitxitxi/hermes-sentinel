@@ -1,0 +1,8 @@
+{
+  "query": "\n-- Create a lifetime free subscription for user ID 1 (tianyuxi888@gmail.com)\n-- Set it to expire in year 2099 (essentially lifetime)\nINSERT INTO subscriptions (userId, plan, status, startDate, endDate, isActive, createdAt, updatedAt)\nVALUES (\n  1,\n  'lifetime_free',\n  'active',\n  NOW(),\n  '2099-12-31 23:59:59',\n  1,\n  NOW(),\n  NOW()\n)\nON DUPLICATE KEY UPDATE\n  plan = 'lifetime_free',\n  status = 'active',\n  endDate = '2099-12-31 23:59:59',\n  isActive = 1,\n  updatedAt = NOW();\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute \n-- Create a lifetime free subscription for user ID 1 (tianyuxi888@gmail.com)\n-- Set it to expire in year 2099 (essentially lifetime)\nINSERT INTO subscriptions (userId, plan, status, startDate, endDate, isActive, createdAt, updatedAt)\nVALUES (\n  1,\n  'lifetime_free',\n  'active',\n  NOW(),\n  '2099-12-31 23:59:59',\n  1,\n  NOW(),\n  NOW()\n)\nON DUPLICATE KEY UPDATE\n  plan = 'lifetime_free',\n  status = 'active',\n  endDate = '2099-12-31 23:59:59',\n  isActive = 1,\n  updatedAt = NOW();\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 4: Unknown column 'userId' in 'field list'"
+  ]
+}
