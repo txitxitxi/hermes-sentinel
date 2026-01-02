@@ -277,6 +277,36 @@ export const appRouter = router({
         }
         return getRecentMonitoringLogs(input.limit);
       }),
+
+    // Monitoring service control
+    getMonitoringStatus: adminProcedure.query(async () => {
+      const { getMonitoringStatus } = await import('./monitoring-control');
+      return getMonitoringStatus();
+    }),
+
+    startMonitoring: adminProcedure.mutation(async () => {
+      const { startMonitoring } = await import('./monitoring-control');
+      return startMonitoring();
+    }),
+
+    stopMonitoring: adminProcedure.mutation(async () => {
+      const { stopMonitoring } = await import('./monitoring-control');
+      return stopMonitoring();
+    }),
+
+    // Test notification
+    sendTestNotification: adminProcedure.mutation(async () => {
+      const { notifyOwner } = await import('./_core/notification');
+      const success = await notifyOwner({
+        title: '🧪 Test Notification from Hermès Sentinel',
+        content: `This is a test notification to verify your Manus notification system is working correctly.
+
+**Sent at**: ${new Date().toLocaleString()}
+
+If you received this, your notification system is ready to alert you about Hermès restocks!`,
+      });
+      return { success, message: success ? 'Test notification sent successfully!' : 'Failed to send test notification' };
+    }),
   }),
 });
 

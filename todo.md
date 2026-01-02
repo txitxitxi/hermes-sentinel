@@ -74,3 +74,11 @@
 5. **Push Notifications**
    - Implement Web Push API
    - Set up notification service worker
+
+## New Feature: Owner Notification System
+- [x] Integrate Manus built-in notification to monitoring service
+- [x] Update monitoring service to send notifications to owner
+- [x] Add owner monitoring configuration interface
+- [x] Create admin control panel for monitoring service
+- [x] Test notification delivery
+- [x] Create checkpoint and deliver

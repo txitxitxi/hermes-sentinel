@@ -12,6 +12,7 @@
  */
 
 import { getDb } from './db';
+import { notifyOwner } from './_core/notification';
 import { 
   regions, 
   products, 
@@ -238,8 +239,14 @@ export class MonitoringService {
     if (!db) return;
 
     // Get the product details
-    const product = await db.select().from(products).where(eq(products.id, productId)).limit(1);
-    if (!product[0]) return;
+    const productResult = await db.select().from(products).where(eq(products.id, productId)).limit(1);
+    if (!productResult[0]) return;
+    const product = productResult[0];
+
+    // Get the region details
+    const regionResult = await db.select().from(regions).where(eq(regions.id, regionId)).limit(1);
+    if (!regionResult[0]) return;
+    const region = regionResult[0];
 
     // Get the latest restock record
     const restocks = await db
@@ -251,7 +258,45 @@ export class MonitoringService {
     
     if (!restocks[0]) return;
 
-    // In production, this would:
+    // Send notification to owner via Manus built-in notification
+    try {
+      const notificationTitle = `🎉 Hermès Restock Alert: ${product.name}`;
+      const notificationContent = `
+**Region**: ${region.name} (${region.code})
+**Product**: ${product.name}
+${product.color ? `**Color**: ${product.color}` : ''}
+${product.size ? `**Size**: ${product.size}` : ''}
+${product.price ? `**Price**: ${product.currency} ${product.price}` : ''}
+
+**Product URL**: ${region.url}
+
+Detected at: ${new Date().toLocaleString()}
+      `.trim();
+
+      const notificationSent = await notifyOwner({
+        title: notificationTitle,
+        content: notificationContent,
+      });
+
+      if (notificationSent) {
+        console.log(`[MonitoringService] ✅ Owner notification sent for product ${productId}`);
+        
+        // Update restock record
+        await db
+          .update(restockHistory)
+          .set({
+            wasNotified: true,
+            notificationCount: 1,
+          })
+          .where(eq(restockHistory.id, restocks[0].id));
+      } else {
+        console.log(`[MonitoringService] ⚠️ Failed to send owner notification for product ${productId}`);
+      }
+    } catch (error) {
+      console.error('[MonitoringService] Error sending owner notification:', error);
+    }
+
+    // In production, this would also:
     // 1. Find all users monitoring this region
     // 2. Check their product filters
     // 3. Create notification records for matching users
