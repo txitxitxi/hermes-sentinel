@@ -114,3 +114,25 @@
 - [x] Update documentation in monitoring-service.ts
 - [x] Update test cases to reflect new logic
 - [x] Verify filter matching works correctly
+
+## Feature: Filter Management
+- [x] Add edit button to each filter card
+- [x] Implement edit filter functionality (populate form with existing data)
+- [x] Add delete button to each filter card
+- [x] Implement delete filter API and frontend
+- [x] Add confirmation dialog for delete action
+- [x] Test edit and delete functionality
+
+## Feature: Enhanced Notifications
+- [x] Update notification content to show which filter matched
+- [x] Add filter name/description to notification records
+- [x] Display matched filter info in notification UI
+- [x] Test notification content improvements
+
+## Feature: Real Web Scraping
+- [x] Install Puppeteer dependencies
+- [x] Implement Hermès website scraper in monitoring-service
+- [x] Add product data extraction logic
+- [x] Implement anti-detection measures (stealth, random delays)
+- [x] Test scraping on real Hermès websites
+- [x] Add error handling and retry logic

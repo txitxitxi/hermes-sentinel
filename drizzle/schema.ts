@@ -190,6 +190,7 @@ export const notifications = mysqlTable("notifications", {
   userId: int("user_id").notNull(),
   productId: int("product_id").notNull(),
   restockId: int("restock_id").notNull(),
+  filterId: int("filter_id"), // Which filter matched this product
   channel: mysqlEnum("channel", ["email", "push"]).notNull(),
   status: mysqlEnum("status", ["pending", "sent", "failed"]).default("pending").notNull(),
   sentAt: timestamp("sent_at"),
@@ -199,6 +200,7 @@ export const notifications = mysqlTable("notifications", {
   userIdIdx: index("user_id_idx").on(table.userId),
   statusIdx: index("status_idx").on(table.status),
   restockIdIdx: index("restock_id_idx").on(table.restockId),
+  filterIdIdx: index("filter_id_idx").on(table.filterId),
 }));
 
 export type Notification = typeof notifications.$inferSelect;

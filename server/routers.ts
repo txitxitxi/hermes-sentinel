@@ -205,6 +205,62 @@ export const appRouter = router({
         await db.insert(productFilters).values(newFilter);
         return { success: true };
       }),
+
+    // Update existing filter
+    updateFilter: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        categoryId: z.number().nullable(),
+        colors: z.array(z.string()).nullable(),
+        sizes: z.array(z.string()).nullable(),
+        minPrice: z.number().nullable(),
+        maxPrice: z.number().nullable(),
+        keywords: z.string().nullable(),
+        isActive: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database unavailable' });
+
+        const updateData: any = {
+          categoryId: input.categoryId,
+          colors: input.colors ? JSON.stringify(input.colors) : null,
+          sizes: input.sizes ? JSON.stringify(input.sizes) : null,
+          minPrice: input.minPrice?.toString() || null,
+          maxPrice: input.maxPrice?.toString() || null,
+          keywords: input.keywords,
+        };
+
+        if (input.isActive !== undefined) {
+          updateData.isActive = input.isActive;
+        }
+
+        await db.update(productFilters)
+          .set(updateData)
+          .where(
+            and(
+              eq(productFilters.id, input.id),
+              eq(productFilters.userId, ctx.user.id)
+            )
+          );
+        return { success: true };
+      }),
+
+    // Delete filter
+    deleteFilter: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database unavailable' });
+
+        await db.delete(productFilters).where(
+          and(
+            eq(productFilters.id, input.id),
+            eq(productFilters.userId, ctx.user.id)
+          )
+        );
+        return { success: true };
+      }),
   }),
 
   restock: router({

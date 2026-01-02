@@ -11,7 +11,7 @@
  * - Notification queue management
  */
 
-import { getDb } from './db';
+import { getDb, getUserProductFilters } from './db';
 import { notifyOwner } from './_core/notification';
 import { 
   regions, 
@@ -197,22 +197,112 @@ export class MonitoringService {
 
   /**
    * Scrape a region's website for products
-   * In production, this would use Puppeteer/Playwright with anti-detection measures
+   * In production, this woul  /**
+   * Scrape a region's Hermès website for products
    */
   private async scrapeRegionWebsite(region: Region): Promise<InsertProduct[]> {
-    // SIMULATION: In production, this would:
-    // 1. Launch headless browser with stealth plugins
-    // 2. Navigate to region URL with random delays
-    // 3. Parse product listings
-    // 4. Extract product details (name, price, availability, etc.)
-    // 5. Handle pagination
-    // 6. Rotate proxy IPs to avoid detection
+    const puppeteer = require('puppeteer-extra');
+    const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+    puppeteer.use(StealthPlugin());
 
-    // For now, return empty array (no products found)
-    // This prevents the system from creating fake data
-    return [];
+    let browser;
+    try {
+      console.log(`[MonitoringService] Launching browser for ${region.name}...`);
+      
+      // Launch browser with stealth mode
+      browser = await puppeteer.launch({
+        headless: true,
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-accelerated-2d-canvas',
+          '--disable-gpu',
+          '--window-size=1920x1080',
+        ],
+      });
+
+      const page = await browser.newPage();
+      
+      // Set realistic viewport and user agent
+      await page.setViewport({ width: 1920, height: 1080 });
+      await page.setUserAgent(
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      );
+
+      // Add random delay to appear more human-like
+      const randomDelay = () => new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+      await randomDelay();
+
+      console.log(`[MonitoringService] Navigating to ${region.url}...`);
+      await page.goto(region.url, {
+        waitUntil: 'networkidle2',
+        timeout: 30000,
+      });
+
+      await randomDelay();
+
+      // Extract products from the page
+      // NOTE: This is a generic scraper. Hermès website structure may vary by region.
+      // You may need to adjust selectors based on actual website structure.
+      const products = await page.evaluate((regionId: number) => {
+        const productElements = document.querySelectorAll('[data-product], .product-item, .product-card');
+        const results: any[] = [];
+
+        productElements.forEach((el: Element) => {
+          try {
+            // Try to extract product information
+            // These selectors are generic and may need adjustment
+            const nameEl = el.querySelector('.product-name, .product-title, h2, h3');
+            const priceEl = el.querySelector('.product-price, .price, [data-price]');
+            const linkEl = el.querySelector('a[href]');
+            const imageEl = el.querySelector('img');
+
+            if (nameEl && linkEl) {
+              const name = nameEl.textContent?.trim() || '';
+              const priceText = priceEl?.textContent?.trim() || '';
+              const productUrl = (linkEl as HTMLAnchorElement).href;
+              const imageUrl = imageEl ? (imageEl as HTMLImageElement).src : '';
+
+              // Extract price and currency
+              const priceMatch = priceText.match(/([A-Z$€£¥]+)\s*([\d,]+(?:\.\d{2})?)/i);
+              let price = null;
+              let currency = null;
+              if (priceMatch) {
+                currency = priceMatch[1];
+                price = priceMatch[2].replace(/,/g, '');
+              }
+
+              results.push({
+                regionId,
+                name,
+                price,
+                currency,
+                productUrl,
+                imageUrl,
+                isAvailable: true,
+              });
+            }
+          } catch (error) {
+            console.error('Error parsing product element:', error);
+          }
+        });
+
+        return results;
+      }, region.id);
+
+      console.log(`[MonitoringService] Found ${products.length} products on ${region.name}`);
+      return products;
+
+    } catch (error) {
+      console.error(`[MonitoringService] Error scraping ${region.name}:`, error);
+      return [];
+    } finally {
+      if (browser) {
+        await browser.close();
+      }
+    }
   }
-
   /**
    * Record a restock event
    */
@@ -258,6 +348,70 @@ export class MonitoringService {
     
     if (!restocks[0]) return;
 
+    // Check which filters match this product (for owner)
+    let matchedFilterInfo = '';
+    try {
+      const ownerFilters = await getUserProductFilters(1); // Assuming owner is user ID 1
+      const matchingFilters = [];
+      
+      for (const filter of ownerFilters) {
+        if (!filter.isActive) continue;
+        
+        let matches = true;
+        
+        // Check category
+        if (filter.categoryId && product.categoryId !== filter.categoryId) {
+          matches = false;
+        }
+        
+        // Check colors
+        if (matches && filter.colors && product.color) {
+          const colorArray = JSON.parse(filter.colors);
+          if (!colorArray.includes(product.color)) {
+            matches = false;
+          }
+        }
+        
+        // Check sizes
+        if (matches && filter.sizes && product.size) {
+          const sizeArray = JSON.parse(filter.sizes);
+          if (!sizeArray.includes(product.size)) {
+            matches = false;
+          }
+        }
+        
+        // Check price range
+        if (matches && product.price) {
+          const priceNum = parseFloat(product.price);
+          if (filter.minPrice && priceNum < parseFloat(filter.minPrice)) {
+            matches = false;
+          }
+          if (filter.maxPrice && priceNum > parseFloat(filter.maxPrice)) {
+            matches = false;
+          }
+        }
+        
+        // Check keywords
+        if (matches && filter.keywords) {
+          const keywords = filter.keywords.toLowerCase();
+          const productText = `${product.name} ${product.description || ''}`.toLowerCase();
+          if (!productText.includes(keywords)) {
+            matches = false;
+          }
+        }
+        
+        if (matches) {
+          matchingFilters.push(filter);
+        }
+      }
+      
+      if (matchingFilters.length > 0) {
+        matchedFilterInfo = `\n\n**Matched Filter(s)**: ${matchingFilters.map(f => `Filter #${f.id}`).join(', ')}`;
+      }
+    } catch (error) {
+      console.error('[MonitoringService] Error checking filters:', error);
+    }
+
     // Send notification to owner via Manus built-in notification
     try {
       const notificationTitle = `🎉 Hermès Restock Alert: ${product.name}`;
@@ -266,7 +420,7 @@ export class MonitoringService {
 **Product**: ${product.name}
 ${product.color ? `**Color**: ${product.color}` : ''}
 ${product.size ? `**Size**: ${product.size}` : ''}
-${product.price ? `**Price**: ${product.currency} ${product.price}` : ''}
+${product.price ? `**Price**: ${product.currency} ${product.price}` : ''}${matchedFilterInfo}
 
 **Product URL**: ${region.url}
 

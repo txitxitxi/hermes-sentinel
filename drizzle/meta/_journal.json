@@ -15,6 +15,13 @@
       "when": 1767302671924,
       "tag": "0001_panoramic_colossus",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1767334617975,
+      "tag": "0002_fine_black_knight",
+      "breakpoints": true
     }
   ]
 }
