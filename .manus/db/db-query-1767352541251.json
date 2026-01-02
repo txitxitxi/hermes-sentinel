@@ -1,0 +1,55 @@
+{
+  "query": "SELECT id, region_id, status, scan_type, products_found, duration, created_at FROM monitoring_logs ORDER BY created_at DESC LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute SELECT id, region_id, status, scan_type, products_found, duration, created_at FROM monitoring_logs ORDER BY created_at DESC LIMIT 5",
+  "rows": [
+    {
+      "id": "30794",
+      "region_id": "1",
+      "status": "success",
+      "scan_type": "manual",
+      "products_found": "24",
+      "duration": "16410",
+      "created_at": "2026-01-02 11:15:01"
+    },
+    {
+      "id": "30793",
+      "region_id": "1",
+      "status": "success",
+      "scan_type": "auto",
+      "products_found": "24",
+      "duration": "14211",
+      "created_at": "2026-01-02 11:09:59"
+    },
+    {
+      "id": "30792",
+      "region_id": "1",
+      "status": "success",
+      "scan_type": "auto",
+      "products_found": "24",
+      "duration": "14560",
+      "created_at": "2026-01-02 11:07:29"
+    },
+    {
+      "id": "30791",
+      "region_id": "1",
+      "status": "success",
+      "scan_type": "auto",
+      "products_found": "24",
+      "duration": "10970",
+      "created_at": "2026-01-02 11:06:56"
+    },
+    {
+      "id": "30790",
+      "region_id": "1",
+      "status": "success",
+      "scan_type": "auto",
+      "products_found": "24",
+      "duration": "11531",
+      "created_at": "2026-01-02 11:06:26"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tregion_id\tstatus\tscan_type\tproducts_found\tduration\tcreated_at\n30794\t1\tsuccess\tmanual\t24\t16410\t2026-01-02 11:15:01\n30793\t1\tsuccess\tauto\t24\t14211\t2026-01-02 11:09:59\n30792\t1\tsuccess\tauto\t24\t14560\t2026-01-02 11:07:29\n30791\t1\tsuccess\tauto\t24\t10970\t2026-01-02 11:06:56\n30790\t1\tsuccess\tauto\t24\t11531\t2026-01-02 11:06:26\n",
+  "stderr": "",
+  "execution_time_ms": 351
+}

@@ -295,6 +295,7 @@ export const appRouter = router({
             id: monitoringLogs.id,
             regionId: monitoringLogs.regionId,
             regionName: regions.name,
+            scanType: monitoringLogs.scanType,
             productsFound: monitoringLogs.productsFound,
             newRestocks: monitoringLogs.newRestocks,
             duration: monitoringLogs.duration,

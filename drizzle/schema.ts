@@ -212,6 +212,7 @@ export const monitoringLogs = mysqlTable("monitoring_logs", {
   id: int("id").autoincrement().primaryKey(),
   regionId: int("region_id").notNull(),
   status: mysqlEnum("status", ["success", "failed", "blocked"]).notNull(),
+  scanType: mysqlEnum("scan_type", ["auto", "manual"]).default("auto").notNull(), // Track if scan was automatic or manual
   productsFound: int("products_found").default(0).notNull(),
   newRestocks: int("new_restocks").default(0).notNull(),
   duration: int("duration").notNull(), // milliseconds

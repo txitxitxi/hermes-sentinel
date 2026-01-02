@@ -85,7 +85,7 @@ export class MonitoringService {
   /**
    * Run a complete monitoring cycle for all active regions
    */
-  private async runMonitoringCycle() {
+  private async runMonitoringCycle(scanType: 'auto' | 'manual' = 'auto') {
     const db = await getDb();
     if (!db) {
       console.error('[MonitoringService] Database not available');
@@ -100,7 +100,7 @@ export class MonitoringService {
 
       // Monitor each region
       for (const region of activeRegions) {
-        await this.monitorRegion(region);
+        await this.monitorRegion(region, scanType);
         
         // Add delay between regions to avoid rate limiting
         await this.delay(2000);
@@ -113,7 +113,7 @@ export class MonitoringService {
   /**
    * Monitor a specific region for product changes
    */
-  private async monitorRegion(region: Region) {
+  private async monitorRegion(region: Region, scanType: 'auto' | 'manual' = 'auto') {
     const startTime = Date.now();
     const db = await getDb();
     if (!db) return;
@@ -195,7 +195,7 @@ export class MonitoringService {
 
       // Log successful monitoring
       const duration = Date.now() - startTime;
-      await this.logMonitoring(region.id, 'success', productsFound, newRestocks, duration, undefined, scrapedProducts);
+      await this.logMonitoring(region.id, 'success', productsFound, newRestocks, duration, scanType, undefined, scrapedProducts);
 
       if (newRestocks > 0) {
         console.log(`[MonitoringService] Found ${newRestocks} new restocks in ${region.name}`);
@@ -204,7 +204,7 @@ export class MonitoringService {
       const duration = Date.now() - startTime;
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       
-      await this.logMonitoring(region.id, 'failed', 0, 0, duration, errorMessage);
+      await this.logMonitoring(region.id, 'failed', 0, 0, duration, scanType, errorMessage);
       console.error(`[MonitoringService] Error monitoring ${region.name}:`, error);
     }
   }
@@ -507,6 +507,7 @@ Detected at: ${new Date().toLocaleString()}
     productsFound: number,
     newRestocks: number,
     duration: number,
+    scanType: 'auto' | 'manual' = 'auto',
     errorMessage?: string,
     productDetails?: any[]
   ) {
@@ -516,6 +517,7 @@ Detected at: ${new Date().toLocaleString()}
     const logData: InsertMonitoringLog = {
       regionId,
       status,
+      scanType,
       productsFound,
       newRestocks,
       duration,
@@ -532,7 +534,7 @@ Detected at: ${new Date().toLocaleString()}
    */
   async runManualScan() {
     console.log('[MonitoringService] Running manual scan...');
-    await this.runMonitoringCycle();
+    await this.runMonitoringCycle('manual');
     console.log('[MonitoringService] Manual scan completed');
   }
 

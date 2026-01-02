@@ -89,6 +89,9 @@ export default function AdminPanel() {
                         <CheckCircle className="h-3 w-3 mr-1" />
                         Running
                       </Badge>
+                      <Badge variant="default" className="bg-blue-600">
+                        🤖 Auto Scan Enabled
+                      </Badge>
                       {monitoringStatus.uptime && (
                         <span className="text-xs text-muted-foreground">
                           Uptime: {Math.floor(monitoringStatus.uptime / 1000 / 60)} min
@@ -96,10 +99,15 @@ export default function AdminPanel() {
                       )}
                     </>
                   ) : (
-                    <Badge variant="outline" className="text-gray-500">
-                      <XCircle className="h-3 w-3 mr-1" />
-                      Stopped
-                    </Badge>
+                    <>
+                      <Badge variant="outline" className="text-gray-500">
+                        <XCircle className="h-3 w-3 mr-1" />
+                        Stopped
+                      </Badge>
+                      <Badge variant="outline" className="text-gray-500">
+                        🚫 Auto Scan Disabled
+                      </Badge>
+                    </>
                   )}
                 </div>
               </div>
@@ -304,8 +312,11 @@ export default function AdminPanel() {
                 variant="destructive"
                 onClick={() => {
                   clearScanLogs.mutate(undefined, {
-                    onSuccess: () => {
-                      refetchMonitoringLogs();
+                    onSuccess: async () => {
+                      // Invalidate all admin queries to clear cache
+                      await utils.admin.invalidate();
+                      // Force refetch monitoring logs
+                      await refetchMonitoringLogs();
                     },
                     onError: (error: any) => {
                       console.error('[AdminPanel] clearScanLogs mutation failed:', error);
@@ -341,7 +352,12 @@ export default function AdminPanel() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <p className="font-medium">{log.regionName || `Region ID: ${log.regionId}`}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">{log.regionName || `Region ID: ${log.regionId}`}</p>
+                          <Badge variant="outline" className="text-xs">
+                            {log.scanType === 'manual' ? '🖱️ Manual' : '🤖 Auto'}
+                          </Badge>
+                        </div>
                         <Badge 
                           variant={
                             log.status === 'success' ? 'default' : 

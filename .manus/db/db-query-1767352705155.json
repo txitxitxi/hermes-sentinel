@@ -1,0 +1,9 @@
+{
+  "query": "SELECT id, region_id, status, scan_type, duration, created_at FROM monitoring_logs WHERE created_at >= '2026-01-02 16:17:00' ORDER BY created_at DESC LIMIT 3",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute SELECT id, region_id, status, scan_type, duration, created_at FROM monitoring_logs WHERE created_at >= '2026-01-02 16:17:00' ORDER BY created_at DESC LIMIT 3",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 77
+}

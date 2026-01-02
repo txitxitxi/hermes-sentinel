@@ -1,0 +1,150 @@
+{
+  "query": "SELECT id, status, products_found, duration, created_at FROM monitoring_logs ORDER BY created_at DESC LIMIT 20",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute SELECT id, status, products_found, duration, created_at FROM monitoring_logs ORDER BY created_at DESC LIMIT 20",
+  "rows": [
+    {
+      "id": "30792",
+      "status": "success",
+      "products_found": "24",
+      "duration": "14560",
+      "created_at": "2026-01-02 11:07:29"
+    },
+    {
+      "id": "30791",
+      "status": "success",
+      "products_found": "24",
+      "duration": "10970",
+      "created_at": "2026-01-02 11:06:56"
+    },
+    {
+      "id": "30790",
+      "status": "success",
+      "products_found": "24",
+      "duration": "11531",
+      "created_at": "2026-01-02 11:06:26"
+    },
+    {
+      "id": "30789",
+      "status": "success",
+      "products_found": "24",
+      "duration": "9791",
+      "created_at": "2026-01-02 11:05:54"
+    },
+    {
+      "id": "30788",
+      "status": "success",
+      "products_found": "24",
+      "duration": "13055",
+      "created_at": "2026-01-02 11:05:28"
+    },
+    {
+      "id": "30787",
+      "status": "success",
+      "products_found": "24",
+      "duration": "11113",
+      "created_at": "2026-01-02 11:04:56"
+    },
+    {
+      "id": "30786",
+      "status": "failed",
+      "products_found": "0",
+      "duration": "25",
+      "created_at": "2026-01-02 11:04:33"
+    },
+    {
+      "id": "30785",
+      "status": "success",
+      "products_found": "24",
+      "duration": "14342",
+      "created_at": "2026-01-02 11:04:29"
+    },
+    {
+      "id": "30784",
+      "status": "failed",
+      "products_found": "0",
+      "duration": "27",
+      "created_at": "2026-01-02 11:04:03"
+    },
+    {
+      "id": "30783",
+      "status": "success",
+      "products_found": "24",
+      "duration": "9740",
+      "created_at": "2026-01-02 11:03:54"
+    },
+    {
+      "id": "30782",
+      "status": "failed",
+      "products_found": "0",
+      "duration": "1",
+      "created_at": "2026-01-02 11:03:33"
+    },
+    {
+      "id": "30781",
+      "status": "success",
+      "products_found": "24",
+      "duration": "13712",
+      "created_at": "2026-01-02 11:03:28"
+    },
+    {
+      "id": "30780",
+      "status": "failed",
+      "products_found": "0",
+      "duration": "0",
+      "created_at": "2026-01-02 11:03:03"
+    },
+    {
+      "id": "30779",
+      "status": "success",
+      "products_found": "24",
+      "duration": "15331",
+      "created_at": "2026-01-02 11:03:00"
+    },
+    {
+      "id": "30778",
+      "status": "failed",
+      "products_found": "0",
+      "duration": "1",
+      "created_at": "2026-01-02 11:02:50"
+    },
+    {
+      "id": "30777",
+      "status": "failed",
+      "products_found": "0",
+      "duration": "102",
+      "created_at": "2026-01-02 11:02:33"
+    },
+    {
+      "id": "30776",
+      "status": "success",
+      "products_found": "24",
+      "duration": "14286",
+      "created_at": "2026-01-02 11:02:29"
+    },
+    {
+      "id": "30775",
+      "status": "failed",
+      "products_found": "0",
+      "duration": "29",
+      "created_at": "2026-01-02 11:02:03"
+    },
+    {
+      "id": "30774",
+      "status": "success",
+      "products_found": "24",
+      "duration": "12185",
+      "created_at": "2026-01-02 11:01:57"
+    },
+    {
+      "id": "30773",
+      "status": "failed",
+      "products_found": "0",
+      "duration": "1",
+      "created_at": "2026-01-02 11:01:33"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstatus\tproducts_found\tduration\tcreated_at\n30792\tsuccess\t24\t14560\t2026-01-02 11:07:29\n30791\tsuccess\t24\t10970\t2026-01-02 11:06:56\n30790\tsuccess\t24\t11531\t2026-01-02 11:06:26\n30789\tsuccess\t24\t9791\t2026-01-02 11:05:54\n30788\tsuccess\t24\t13055\t2026-01-02 11:05:28\n30787\tsuccess\t24\t11113\t2026-01-02 11:04:56\n30786\tfailed\t0\t25\t2026-01-02 11:04:33\n30785\tsuccess\t24\t14342\t2026-01-02 11:04:29\n30784\tfailed\t0\t27\t2026-01-02 11:04:03\n30783\tsuccess\t24\t9740\t2026-01-02 11:03:54\n30782\tfailed\t0\t1\t2026-01-02 11:03:33\n30781\tsuccess\t24\t13712\t2026-01-02 11:03:28\n30780\tfailed\t0\t0\t2026-01-02 11:03:03\n30779\tsuccess\t24\t15331\t2026-01-02 11:03:00\n30778\tfailed\t0\t1\t2026-01-02 11:02:50\n30777\tfailed\t0\t102\t2026-01-02 11:02:33\n30776\tsuccess\t24\t14286\t2026-01-02 11:02:29\n30775\tfailed\t0\t29\t2026-01-02 11:02:03\n30774\tsuccess\t24\t12185\t2026-01-02 11:01:57\n30773\tfailed\t0\t1\t2026-01-02 11:01:33\n",
+  "stderr": "",
+  "execution_time_ms": 104
+}

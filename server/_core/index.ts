@@ -1,4 +1,7 @@
 import "dotenv/config";
+// Import Puppeteer config FIRST to ensure Chromium path is set at server startup
+import '../puppeteer.config';
+
 import express from "express";
 import { createServer } from "http";
 import net from "net";

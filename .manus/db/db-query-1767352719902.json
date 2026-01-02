@@ -1,0 +1,34 @@
+{
+  "query": "SELECT id, region_id, status, scan_type, duration, FROM_UNIXTIME(UNIX_TIMESTAMP(created_at)) as time FROM monitoring_logs ORDER BY created_at DESC LIMIT 3",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute SELECT id, region_id, status, scan_type, duration, FROM_UNIXTIME(UNIX_TIMESTAMP(created_at)) as time FROM monitoring_logs ORDER BY created_at DESC LIMIT 3",
+  "rows": [
+    {
+      "id": "30795",
+      "region_id": "1",
+      "status": "success",
+      "scan_type": "manual",
+      "duration": "11712",
+      "time": "2026-01-02 11:17:09"
+    },
+    {
+      "id": "30794",
+      "region_id": "1",
+      "status": "success",
+      "scan_type": "manual",
+      "duration": "16410",
+      "time": "2026-01-02 11:15:01"
+    },
+    {
+      "id": "30793",
+      "region_id": "1",
+      "status": "success",
+      "scan_type": "auto",
+      "duration": "14211",
+      "time": "2026-01-02 11:09:59"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tregion_id\tstatus\tscan_type\tduration\ttime\n30795\t1\tsuccess\tmanual\t11712\t2026-01-02 11:17:09\n30794\t1\tsuccess\tmanual\t16410\t2026-01-02 11:15:01\n30793\t1\tsuccess\tauto\t14211\t2026-01-02 11:09:59\n",
+  "stderr": "",
+  "execution_time_ms": 101
+}

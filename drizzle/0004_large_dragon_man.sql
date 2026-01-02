@@ -1,0 +1,1 @@
+ALTER TABLE `monitoring_logs` ADD `scan_type` enum('auto','manual') DEFAULT 'auto' NOT NULL;

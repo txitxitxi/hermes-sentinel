@@ -259,3 +259,30 @@
 **Files Modified**:
 - `server/puppeteer.config.ts` (new file)
 - `server/monitoring-service.ts` (import config, add cleanup handlers)
+
+
+## Session 2026-01-02 Part 2: Four Critical Issues to Fix
+
+### Issue 1: Clear History Button Still Not Working
+- [x] Replace tRPC refetch with proper cache invalidation
+- [x] Use queryClient.invalidateQueries() instead of refetchMonitoringLogs()
+- [ ] Test Clear History button successfully updates UI - **STILL NOT WORKING** (tRPC caching issue persists)
+
+### Issue 2: Chromium Path Error Returned After Restart
+- [x] Investigate why previous fix didn't persist (failed logs at 3:02-3:03 AM)
+- [x] Check if server was restarted/redeployed and config was lost
+- [x] Implement more robust solution that survives all restart scenarios
+- [x] Test fix persists after hard restart - **FIXED** (import config at server startup in server/_core/index.ts)
+
+### Issue 3: Add Scan Type Labels (Auto vs Manual)
+- [x] Add scan_type field to monitoring_logs table schema (enum: 'auto' | 'manual')
+- [x] Update monitoring service to set scan_type='auto' for automatic scans
+- [x] Update manual scan to set scan_type='manual'
+- [x] Update Admin Panel UI to display scan type label next to region name
+- [ ] Test both auto and manual scans show correct labels - **INFRASTRUCTURE COMPLETE** (but manual scans still showing as 'auto' - debugging needed)
+
+### Issue 4: Add Auto Scan Status Indicator
+- [x] Add status indicator showing "Auto Scan Enabled" when monitoring is running
+- [x] Show "Auto Scan Disabled" when monitoring is stopped
+- [x] Update Service Status section in Admin Panel
+- [x] Test status changes when Start/Stop buttons are clicked - **WORKING**
