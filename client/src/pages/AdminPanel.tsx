@@ -1,76 +1,19 @@
-import React from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
-import { Users, Activity, TrendingUp, AlertCircle, CheckCircle, XCircle, Play, Square, RefreshCw } from "lucide-react";
+import { Users, Activity, TrendingUp, AlertCircle, CheckCircle, XCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useLocation } from "wouter";
-
-type ScanLog = {
-  id: number;
-  regionId: number;
-  regionName: string | null;
-  status: 'success' | 'failed' | 'blocked';
-  productsFound: number;
-  newRestocks: number;
-  duration: number;
-  errorMessage: string | null;
-  productDetails: string | null;
-  createdAt: Date;
-};
-
-type MonitoringLog = {
-  id: number;
-  regionId: number;
-  regionName: string | null;
-  status: 'success' | 'failed' | 'blocked';
-  productsFound: number;
-  newRestocks: number;
-  duration: number;
-  errorMessage: string | null;
-  createdAt: Date;
-};
 
 export default function AdminPanel() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
-  const [expandedLogId, setExpandedLogId] = React.useState<number | null>(null);
   
   const { data: stats, isLoading: statsLoading } = trpc.admin.getStats.useQuery();
   const { data: users, isLoading: usersLoading } = trpc.admin.getUsers.useQuery({ limit: 50 });
-  const { data: monitoringLogsData, isLoading: logsLoading } = trpc.admin.getMonitoringLogs.useQuery({ limit: 50 });
-  const monitoringLogs = monitoringLogsData as MonitoringLog[] | undefined;
-  const { data: scanLogsData, isLoading: scanLogsLoading, refetch: refetchScanLogs } = trpc.admin.getScanLogs.useQuery(undefined, {
-    refetchInterval: 10000, // Refresh every 10 seconds
-  });
-  const scanLogs = scanLogsData as ScanLog[] | undefined;
-  const { data: monitoringStatus, isLoading: statusLoading, refetch: refetchStatus } = trpc.admin.getMonitoringStatus.useQuery(undefined, {
-    refetchInterval: 5000, // Refresh every 5 seconds
-  });
-
-  const startMonitoring = trpc.admin.startMonitoring.useMutation({
-    onSuccess: () => {
-      refetchStatus();
-    },
-  });
-
-  const stopMonitoring = trpc.admin.stopMonitoring.useMutation({
-    onSuccess: () => {
-      refetchStatus();
-    },
-  });
-
-  const sendTestNotification = trpc.admin.sendTestNotification.useMutation();
-
-  const manualScan = trpc.admin.manualScan.useMutation({
-    onSuccess: () => {
-      refetchScanLogs();
-      refetchStatus();
-    },
-  });
+  const { data: monitoringLogs, isLoading: logsLoading } = trpc.admin.getMonitoringLogs.useQuery({ limit: 50 });
 
   // Redirect if not admin
   if (user && user.role !== 'admin') {
@@ -87,140 +30,6 @@ export default function AdminPanel() {
             System overview and management controls
           </p>
         </div>
-
-        {/* Monitoring Service Control */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Monitoring Service Control</CardTitle>
-            <CardDescription>
-              Control the Hermès website monitoring service
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium">Service Status</p>
-                <div className="flex items-center gap-2">
-                  {statusLoading ? (
-                    <Badge variant="outline">Loading...</Badge>
-                  ) : monitoringStatus?.isRunning ? (
-                    <>
-                      <Badge variant="default" className="bg-green-600">
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                        Running
-                      </Badge>
-                      {monitoringStatus.uptime && (
-                        <span className="text-xs text-muted-foreground">
-                          Uptime: {Math.floor(monitoringStatus.uptime / 1000 / 60)} min
-                        </span>
-                      )}
-                    </>
-                  ) : (
-                    <Badge variant="outline" className="text-gray-500">
-                      <XCircle className="h-3 w-3 mr-1" />
-                      Stopped
-                    </Badge>
-                  )}
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="default"
-                  disabled={monitoringStatus?.isRunning || startMonitoring.isPending}
-                  onClick={() => startMonitoring.mutate()}
-                >
-                  <Play className="h-4 w-4 mr-1" />
-                  Start
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={!monitoringStatus?.isRunning || stopMonitoring.isPending}
-                  onClick={() => stopMonitoring.mutate()}
-                >
-                  <Square className="h-4 w-4 mr-1" />
-                  Stop
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => refetchStatus()}
-                >
-                  <RefreshCw className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  disabled={manualScan.isPending}
-                  onClick={() => manualScan.mutate()}
-                >
-                  <RefreshCw className="h-4 w-4 mr-1" />
-                  Manual Scan
-                </Button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t">
-              <div>
-                <p className="text-xs text-muted-foreground">Regions Monitored</p>
-                <p className="text-2xl font-bold">{monitoringStatus?.totalRegionsMonitored || 0}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Restocks Detected</p>
-                <p className="text-2xl font-bold">{monitoringStatus?.totalRestocksDetected || 0}</p>
-              </div>
-            </div>
-
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                The monitoring service runs every 30 seconds. You will receive Manus notifications when restocks are detected.
-                <br />
-                <span className="text-xs">Click "Manual Scan" to trigger an immediate scan of all monitored regions.</span>
-              </AlertDescription>
-            </Alert>
-
-            {manualScan.isSuccess && (
-              <Alert className="bg-green-50 border-green-200">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <AlertDescription className="text-green-800">
-                  ✅ {manualScan.data.message}
-                </AlertDescription>
-              </Alert>
-            )}
-            {manualScan.isError && (
-              <Alert className="bg-red-50 border-red-200">
-                <XCircle className="h-4 w-4 text-red-600" />
-                <AlertDescription className="text-red-800">
-                  ❌ Failed to start manual scan
-                </AlertDescription>
-              </Alert>
-            )}
-
-            <div className="pt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full"
-                disabled={sendTestNotification.isPending}
-                onClick={() => sendTestNotification.mutate()}
-              >
-                {sendTestNotification.isPending ? 'Sending...' : '🧪 Send Test Notification'}
-              </Button>
-              {sendTestNotification.isSuccess && (
-                <p className="text-xs text-green-600 mt-2">
-                  ✅ {sendTestNotification.data.message}
-                </p>
-              )}
-              {sendTestNotification.isError && (
-                <p className="text-xs text-red-600 mt-2">
-                  ❌ Failed to send test notification
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
 
         {/* System Stats */}
         <div className="grid gap-4 md:grid-cols-3">
@@ -309,108 +118,6 @@ export default function AdminPanel() {
           </CardContent>
         </Card>
 
-        {/* Scan Logs - Detailed Activity */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Scan Activity Logs</CardTitle>
-                <CardDescription>
-                  Detailed records of each monitoring scan execution
-                </CardDescription>
-              </div>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => refetchScanLogs()}
-              >
-                <RefreshCw className="h-4 w-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {scanLogsLoading ? (
-              <p className="text-sm text-muted-foreground">Loading scan logs...</p>
-            ) : scanLogs && scanLogs.length > 0 ? (
-              <div className="space-y-3">
-                {scanLogs.slice(0, 20).map((log) => (
-                  <div 
-                    key={log.id} 
-                    className="flex items-start gap-3 border-b border-border pb-3 last:border-0"
-                  >
-                    <div className="mt-1">
-                      {log.status === 'success' && (
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      )}
-                      {log.status === 'failed' && (
-                        <XCircle className="h-4 w-4 text-red-500" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <p className="font-medium">{log.regionName || `Region ID: ${log.regionId}`}</p>
-                        <Badge 
-                          variant={log.status === 'success' ? 'default' : 'destructive'}
-                        >
-                          {log.status}
-                        </Badge>
-                      </div>
-                      <div className="text-sm text-muted-foreground mt-1 space-y-1">
-                        <div className="flex items-center gap-4">
-                          <span>🔍 Products Found: <strong>{log.productsFound}</strong></span>
-                          <span>🆕 New Restocks: <strong className="text-green-600">{log.newRestocks}</strong></span>
-                          <span>⏱️ Duration: {log.duration}ms</span>
-                        </div>
-                        <p className="text-xs">{new Date(log.createdAt).toLocaleString()}</p>
-                        {log.errorMessage && (
-                          <p className="text-red-500 text-xs mt-1">❌ Error: {log.errorMessage}</p>
-                        )}
-                        {log.productDetails && (
-                          <div className="mt-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => setExpandedLogId(expandedLogId === log.id ? null : log.id)}
-                            >
-                              {expandedLogId === log.id ? '▼ Hide' : '▶ Show'} Detected Products
-                            </Button>
-                            {expandedLogId === log.id && (
-                              <div className="mt-2 p-3 bg-muted rounded-md text-xs">
-                                {(() => {
-                                  try {
-                                    const products = JSON.parse(log.productDetails);
-                                    return (
-                                      <div className="space-y-2">
-                                        {products.map((p: any, idx: number) => (
-                                          <div key={idx} className="border-b border-border pb-2 last:border-0">
-                                            <p><strong>Name:</strong> {p.name || 'N/A'}</p>
-                                            {p.price && <p><strong>Price:</strong> {p.currency} {p.price}</p>}
-                                            {p.productUrl && (
-                                              <p><strong>URL:</strong> <a href={p.productUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">{p.productUrl.substring(0, 50)}...</a></p>
-                                            )}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    );
-                                  } catch (e) {
-                                    return <p className="text-red-500">Error parsing product data</p>;
-                                  }
-                                })()}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">No scan logs available. Start monitoring to see activity.</p>
-            )}
-          </CardContent>
-        </Card>
-
         {/* Monitoring Logs */}
         <Card>
           <CardHeader>
@@ -442,7 +149,7 @@ export default function AdminPanel() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <p className="font-medium">{log.regionName || `Region ID: ${log.regionId}`}</p>
+                        <p className="font-medium">Region ID: {log.regionId}</p>
                         <Badge 
                           variant={
                             log.status === 'success' ? 'default' : 

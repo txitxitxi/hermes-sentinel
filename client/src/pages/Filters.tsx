@@ -1,14 +1,14 @@
-import { useState } from "react";
-import { trpc } from "@/lib/trpc";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Switch } from "@/components/ui/switch";
+import { trpc } from "@/lib/trpc";
+import { Filter, Save, Bell } from "lucide-react";
 import { toast } from "sonner";
-import { Filter, Save, Edit, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 export default function Filters() {
   const utils = trpc.useUtils();
@@ -16,90 +16,45 @@ export default function Filters() {
   const { data: categories, isLoading: categoriesLoading } = trpc.filters.getCategories.useQuery();
   const { data: filters } = trpc.filters.getFilters.useQuery();
   
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [colors, setColors] = useState<string>("");
   const [sizes, setSizes] = useState<string>("");
   const [minPrice, setMinPrice] = useState<string>("");
   const [maxPrice, setMaxPrice] = useState<string>("");
   const [keywords, setKeywords] = useState<string>("");
-  const [editingFilterId, setEditingFilterId] = useState<number | null>(null);
+  const [notifyAllRestocks, setNotifyAllRestocks] = useState<boolean>(false);
 
   const saveFilterMutation = trpc.filters.saveFilter.useMutation({
     onSuccess: () => {
-      toast.success("Filter saved successfully!");
+      toast.success("Filter preferences saved successfully");
       utils.filters.getFilters.invalidate();
-      resetForm();
+      // Reset form
+      setSelectedCategory("");
+      setColors("");
+      setSizes("");
+      setMinPrice("");
+      setMaxPrice("");
+      setKeywords("");
+      setNotifyAllRestocks(false);
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to save filter");
+      toast.error(error.message);
     },
   });
-
-  const updateFilterMutation = trpc.filters.updateFilter.useMutation({
-    onSuccess: () => {
-      toast.success("Filter updated successfully!");
-      utils.filters.getFilters.invalidate();
-      resetForm();
-    },
-    onError: (error) => {
-      toast.error(error.message || "Failed to update filter");
-    },
-  });
-
-  const deleteFilterMutation = trpc.filters.deleteFilter.useMutation({
-    onSuccess: () => {
-      toast.success("Filter deleted successfully!");
-      utils.filters.getFilters.invalidate();
-    },
-    onError: (error) => {
-      toast.error(error.message || "Failed to delete filter");
-    },
-  });
-
-  const resetForm = () => {
-    setSelectedCategory("all");
-    setColors("");
-    setSizes("");
-    setMinPrice("");
-    setMaxPrice("");
-    setKeywords("");
-    setEditingFilterId(null);
-  };
-
-  const loadFilterForEdit = (filter: any) => {
-    setEditingFilterId(filter.id);
-    setSelectedCategory(filter.categoryId ? filter.categoryId.toString() : "all");
-    setColors(filter.colors || "");
-    setSizes(filter.sizes || "");
-    setMinPrice(filter.minPrice || "");
-    setMaxPrice(filter.maxPrice || "");
-    setKeywords(filter.keywords || "");
-    // Scroll to form
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
 
   const handleSaveFilter = () => {
-    const colorsArray = colors.trim() ? colors.split(",").map(c => c.trim()).filter(Boolean) : null;
-    const sizesArray = sizes.trim() ? sizes.split(",").map(s => s.trim()).filter(Boolean) : null;
-
-    const filterData = {
-      categoryId: selectedCategory === "all" ? null : parseInt(selectedCategory),
-      colors: colorsArray,
-      sizes: sizesArray,
+    const colorArray = colors.split(',').map(c => c.trim()).filter(Boolean);
+    const sizeArray = sizes.split(',').map(s => s.trim()).filter(Boolean);
+    
+    saveFilterMutation.mutate({
+      categoryId: selectedCategory ? parseInt(selectedCategory) : null,
+      colors: colorArray.length > 0 ? colorArray : null,
+      sizes: sizeArray.length > 0 ? sizeArray : null,
       minPrice: minPrice ? parseFloat(minPrice) : null,
       maxPrice: maxPrice ? parseFloat(maxPrice) : null,
-      keywords: keywords.trim() || null,
-    };
-
-    if (editingFilterId) {
-      updateFilterMutation.mutate({ id: editingFilterId, ...filterData });
-    } else {
-      saveFilterMutation.mutate(filterData);
-    }
-  };
-
-  const handleDeleteFilter = (filterId: number) => {
-    deleteFilterMutation.mutate({ id: filterId });
+      keywords: keywords || null,
+      notifyAllRestocks: notifyAllRestocks,
+    });
   };
 
   return (
@@ -218,24 +173,36 @@ export default function Filters() {
               </p>
             </div>
 
-              <div className="flex gap-2">
-                <Button 
-                  onClick={handleSaveFilter} 
-                  disabled={saveFilterMutation.isPending || updateFilterMutation.isPending}
-                  className="flex-1"
-                >
-                  <Save className="mr-2 h-4 w-4" />
-                  {editingFilterId ? "Update Filter" : "Save Filter"}
-                </Button>
-                {editingFilterId && (
-                  <Button 
-                    onClick={resetForm} 
-                    variant="outline"
-                  >
-                    Cancel
-                  </Button>
-                )}
+            {/* Notify All Restocks Switch */}
+            <div className="flex items-center justify-between p-4 border border-border rounded-lg bg-muted/30">
+              <div className="space-y-1 flex-1">
+                <div className="flex items-center gap-2">
+                  <Bell className="h-4 w-4 text-primary" />
+                  <Label htmlFor="notify-all" className="text-base font-semibold cursor-pointer">
+                    Notify All Restocks
+                  </Label>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Receive notifications for <strong>all</strong> restocked products, regardless of the filter criteria above. 
+                  When enabled, you'll be alerted about every new product that becomes available.
+                </p>
               </div>
+              <Switch
+                id="notify-all"
+                checked={notifyAllRestocks}
+                onCheckedChange={setNotifyAllRestocks}
+                className="ml-4"
+              />
+            </div>
+
+            <Button 
+              onClick={handleSaveFilter} 
+              disabled={saveFilterMutation.isPending}
+              className="w-full md:w-auto"
+            >
+              <Save className="mr-2 h-4 w-4" />
+              Save Filter
+            </Button>
           </CardContent>
         </Card>
 
@@ -259,52 +226,15 @@ export default function Filters() {
                       <h3 className="font-semibold">
                         Filter #{filter.id}
                       </h3>
-                      <div className="flex items-center gap-2">
-                        <span className={`text-xs px-2 py-1 rounded ${
-                          filter.isActive ? 'bg-green-500/10 text-green-500' : 'bg-muted text-muted-foreground'
-                        }`}>
-                          {filter.isActive ? 'Active' : 'Inactive'}
-                        </span>
-                        <Button 
-                          size="sm" 
-                          variant="ghost"
-                          onClick={() => loadFilterForEdit(filter)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button 
-                              size="sm" 
-                              variant="ghost"
-                              className="text-destructive hover:text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Filter?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This action cannot be undone. This filter will be permanently deleted.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction 
-                                onClick={() => handleDeleteFilter(filter.id)}
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
+                      <span className={`text-xs px-2 py-1 rounded ${
+                        filter.isActive ? 'bg-green-500/10 text-green-500' : 'bg-muted text-muted-foreground'
+                      }`}>
+                        {filter.isActive ? 'Active' : 'Inactive'}
+                      </span>
                     </div>
                     <div className="grid gap-2 text-sm">
                       {filter.categoryId && (
-                        <p><span className="text-muted-foreground">Category:</span> {categories?.find(c => c.id === filter.categoryId)?.name || `ID: ${filter.categoryId}`}</p>
+                        <p><span className="text-muted-foreground">Category:</span> {filter.categoryId}</p>
                       )}
                       {filter.colors && (
                         <p><span className="text-muted-foreground">Colors:</span> {filter.colors}</p>

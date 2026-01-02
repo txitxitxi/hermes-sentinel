@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "1833ea86-57dc-4ce2-b7a8-8ce9ad1a7f30",
+  "id": "879bd928-0db8-48d9-b28c-76dc690eb0a2",
   "prevId": "b54d53ff-c29f-49dc-9f34-0cd31fb8874b",
   "tables": {
     "monitoring_configs": {
@@ -212,13 +212,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "filter_id": {
-          "name": "filter_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "channel": {
           "name": "channel",
           "type": "enum('email','push')",
@@ -276,13 +269,6 @@
           "name": "restock_id_idx",
           "columns": [
             "restock_id"
-          ],
-          "isUnique": false
-        },
-        "filter_id_idx": {
-          "name": "filter_id_idx",
-          "columns": [
-            "filter_id"
           ],
           "isUnique": false
         }
@@ -432,6 +418,14 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "notify_all_restocks": {
+          "name": "notify_all_restocks",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
         },
         "is_active": {
           "name": "is_active",

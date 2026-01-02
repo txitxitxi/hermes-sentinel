@@ -1,0 +1,1 @@
+ALTER TABLE `product_filters` ADD `notify_all_restocks` boolean DEFAULT false NOT NULL;

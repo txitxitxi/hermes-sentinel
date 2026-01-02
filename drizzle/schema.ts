@@ -123,6 +123,7 @@ export const productFilters = mysqlTable("product_filters", {
   minPrice: decimal("min_price", { precision: 10, scale: 2 }),
   maxPrice: decimal("max_price", { precision: 10, scale: 2 }),
   keywords: text("keywords"), // Additional search keywords
+  notifyAllRestocks: boolean("notify_all_restocks").default(false).notNull(), // If true, notify for all restocks regardless of filter criteria
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
@@ -190,7 +191,6 @@ export const notifications = mysqlTable("notifications", {
   userId: int("user_id").notNull(),
   productId: int("product_id").notNull(),
   restockId: int("restock_id").notNull(),
-  filterId: int("filter_id"), // Which filter matched this product
   channel: mysqlEnum("channel", ["email", "push"]).notNull(),
   status: mysqlEnum("status", ["pending", "sent", "failed"]).default("pending").notNull(),
   sentAt: timestamp("sent_at"),
@@ -200,29 +200,10 @@ export const notifications = mysqlTable("notifications", {
   userIdIdx: index("user_id_idx").on(table.userId),
   statusIdx: index("status_idx").on(table.status),
   restockIdIdx: index("restock_id_idx").on(table.restockId),
-  filterIdIdx: index("filter_id_idx").on(table.filterId),
 }));
 
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = typeof notifications.$inferInsert;
-
-/**
- * Scan logs table - records each monitoring scan execution
- */
-export const scanLogs = mysqlTable("scan_logs", {
-  id: int("id").autoincrement().primaryKey(),
-  regionId: int("region_id").notNull(),
-  status: mysqlEnum("status", ["success", "failed"]).notNull(),
-  productsFound: int("products_found").default(0),
-  newRestocks: int("new_restocks").default(0),
-  duration: int("duration").notNull(), // in milliseconds
-  errorMessage: text("error_message"),
-  productDetails: text("product_details"), // JSON string of detected products
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-export type ScanLog = typeof scanLogs.$inferSelect;
-export type InsertScanLog = typeof scanLogs.$inferInsert;
 
 /**
  * System monitoring logs

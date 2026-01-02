@@ -1,8 +1,0 @@
-{
-  "query": "\n-- Create subscription for user ID 1 with the Lifetime Free plan (plan_id = 5)\nINSERT INTO subscriptions (user_id, plan_id, status, start_date, end_date, auto_renew, created_at, updated_at)\nVALUES (\n  1,\n  5,\n  'active',\n  NOW(),\n  '2099-12-31 23:59:59',\n  0,\n  NOW(),\n  NOW()\n)\nON DUPLICATE KEY UPDATE\n  plan_id = 5,\n  status = 'active',\n  end_date = '2099-12-31 23:59:59',\n  updated_at = NOW();\n",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute \n-- Create subscription for user ID 1 with the Lifetime Free plan (plan_id = 5)\nINSERT INTO subscriptions (user_id, plan_id, status, start_date, end_date, auto_renew, created_at, updated_at)\nVALUES (\n  1,\n  5,\n  'active',\n  NOW(),\n  '2099-12-31 23:59:59',\n  0,\n  NOW(),\n  NOW()\n)\nON DUPLICATE KEY UPDATE\n  plan_id = 5,\n  status = 'active',\n  end_date = '2099-12-31 23:59:59',\n  updated_at = NOW();\n",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1292 (22007) at line 3: Incorrect timestamp value: '2099-12-31 23:59:59' for column 'end_date' at row 1"
-  ]
-}

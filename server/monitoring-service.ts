@@ -11,7 +11,7 @@
  * - Notification queue management
  */
 
-import { getDb, getUserProductFilters } from './db';
+import { getDb, getUserActiveProductFilters } from './db';
 import { notifyOwner } from './_core/notification';
 import { 
   regions, 
@@ -19,7 +19,6 @@ import {
   restockHistory, 
   notifications, 
   monitoringLogs,
-  scanLogs,
   monitoringConfigs,
   type Region,
   type Product,
@@ -27,7 +26,6 @@ import {
   type InsertRestockHistory,
   type InsertNotification,
   type InsertMonitoringLog,
-  type InsertScanLog,
 } from '../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
 
@@ -63,37 +61,10 @@ export class MonitoringService {
   }
 
   /**
-   * Manually trigger a scan of all monitored regions
-   */
-  public async manualScan(): Promise<void> {
-    const db = await getDb();
-    if (!db) throw new Error('Database not available');
-
-    console.log('[MonitoringService] Manual scan triggered');
-
-    // Get all regions being monitored
-    const monitoredRegions = await db
-      .select()
-      .from(regions)
-      .innerJoin(
-        monitoringConfigs,
-        eq(regions.id, monitoringConfigs.regionId)
-      )
-      .where(eq(monitoringConfigs.isActive, true));
-
-    // Monitor each region
-    for (const { regions: region } of monitoredRegions) {
-      await this.monitorRegion(region);
-      await this.delay(2000); // Delay between regions
-    }
-
-    console.log('[MonitoringService] Manual scan completed');
-  }
-
-  /**
    * Stop the monitoring service
    */
-  public stop() { if (!this.isRunning) {
+  stop() {
+    if (!this.isRunning) {
       return;
     }
 
@@ -209,9 +180,9 @@ export class MonitoringService {
         }
       }
 
-      // Log successful scan
+      // Log successful monitoring
       const duration = Date.now() - startTime;
-      await this.logScan(region.id, 'success', productsFound, newRestocks, duration, undefined, scrapedProducts);
+      await this.logMonitoring(region.id, 'success', productsFound, newRestocks, duration);
 
       if (newRestocks > 0) {
         console.log(`[MonitoringService] Found ${newRestocks} new restocks in ${region.name}`);
@@ -220,126 +191,29 @@ export class MonitoringService {
       const duration = Date.now() - startTime;
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       
-      await this.logScan(region.id, 'failed', 0, 0, duration, errorMessage);
+      await this.logMonitoring(region.id, 'failed', 0, 0, duration, errorMessage);
       console.error(`[MonitoringService] Error monitoring ${region.name}:`, error);
     }
   }
 
   /**
    * Scrape a region's website for products
-   * In production, this woul  /**
-   * Scrape a region's Hermès website for products
+   * In production, this would use Puppeteer/Playwright with anti-detection measures
    */
   private async scrapeRegionWebsite(region: Region): Promise<InsertProduct[]> {
-    // Import puppeteer dynamically to avoid build issues
-    let puppeteer, StealthPlugin;
-    try {
-      puppeteer = (await import('puppeteer-extra')).default;
-      StealthPlugin = (await import('puppeteer-extra-plugin-stealth')).default;
-      puppeteer.use(StealthPlugin());
-    } catch (error) {
-      console.error('[MonitoringService] Failed to load puppeteer:', error);
-      return [];
-    }
+    // SIMULATION: In production, this would:
+    // 1. Launch headless browser with stealth plugins
+    // 2. Navigate to region URL with random delays
+    // 3. Parse product listings
+    // 4. Extract product details (name, price, availability, etc.)
+    // 5. Handle pagination
+    // 6. Rotate proxy IPs to avoid detection
 
-    let browser;
-    try {
-      console.log(`[MonitoringService] Launching browser for ${region.name}...`);
-      
-      // Launch browser with stealth mode
-      browser = await puppeteer.launch({
-        headless: true,
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-accelerated-2d-canvas',
-          '--disable-gpu',
-          '--window-size=1920x1080',
-        ],
-      });
-
-      const page = await browser.newPage();
-      
-      // Set realistic viewport and user agent
-      await page.setViewport({ width: 1920, height: 1080 });
-      await page.setUserAgent(
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      );
-
-      // Add random delay to appear more human-like
-      const randomDelay = () => new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-      await randomDelay();
-
-      console.log(`[MonitoringService] Navigating to ${region.url}...`);
-      await page.goto(region.url, {
-        waitUntil: 'networkidle2',
-        timeout: 30000,
-      });
-
-      await randomDelay();
-
-      // Extract products from the page
-      // NOTE: This is a generic scraper. Hermès website structure may vary by region.
-      // You may need to adjust selectors based on actual website structure.
-      const products = await page.evaluate((regionId: number) => {
-        const productElements = document.querySelectorAll('[data-product], .product-item, .product-card');
-        const results: any[] = [];
-
-        productElements.forEach((el: Element) => {
-          try {
-            // Try to extract product information
-            // These selectors are generic and may need adjustment
-            const nameEl = el.querySelector('.product-name, .product-title, h2, h3');
-            const priceEl = el.querySelector('.product-price, .price, [data-price]');
-            const linkEl = el.querySelector('a[href]');
-            const imageEl = el.querySelector('img');
-
-            if (nameEl && linkEl) {
-              const name = nameEl.textContent?.trim() || '';
-              const priceText = priceEl?.textContent?.trim() || '';
-              const productUrl = (linkEl as HTMLAnchorElement).href;
-              const imageUrl = imageEl ? (imageEl as HTMLImageElement).src : '';
-
-              // Extract price and currency
-              const priceMatch = priceText.match(/([A-Z$€£¥]+)\s*([\d,]+(?:\.\d{2})?)/i);
-              let price = null;
-              let currency = null;
-              if (priceMatch) {
-                currency = priceMatch[1];
-                price = priceMatch[2].replace(/,/g, '');
-              }
-
-              results.push({
-                regionId,
-                name,
-                price,
-                currency,
-                productUrl,
-                imageUrl,
-                isAvailable: true,
-              });
-            }
-          } catch (error) {
-            console.error('Error parsing product element:', error);
-          }
-        });
-
-        return results;
-      }, region.id);
-
-      console.log(`[MonitoringService] Found ${products.length} products on ${region.name}`);
-      return products;
-
-    } catch (error) {
-      console.error(`[MonitoringService] Error scraping ${region.name}:`, error);
-      return [];
-    } finally {
-      if (browser) {
-        await browser.close();
-      }
-    }
+    // For now, return empty array (no products found)
+    // This prevents the system from creating fake data
+    return [];
   }
+
   /**
    * Record a restock event
    */
@@ -385,13 +259,32 @@ export class MonitoringService {
     
     if (!restocks[0]) return;
 
-    // Check which filters match this product (for owner)
-    let matchedFilterInfo = '';
-    try {
-      const ownerFilters = await getUserProductFilters(1); // Assuming owner is user ID 1
+    // Find all users monitoring this region
+    const monitoringUsers = await db
+      .select({ userId: monitoringConfigs.userId })
+      .from(monitoringConfigs)
+      .where(and(
+        eq(monitoringConfigs.regionId, regionId),
+        eq(monitoringConfigs.isActive, true)
+      ));
+
+    // For each user, check their filters
+    for (const { userId } of monitoringUsers) {
+      const userFilters = await getUserActiveProductFilters(userId);
+      
+      // Check if user has "notify all restocks" enabled
+      const hasNotifyAll = userFilters.some(f => f.notifyAllRestocks);
+      
+      if (hasNotifyAll) {
+        // Send notification immediately without checking filter criteria
+        await this.sendRestockNotification(product, region, restocks[0], userId, 'Notify All Restocks enabled');
+        continue;
+      }
+
+      // Otherwise, check filter criteria
       const matchingFilters = [];
       
-      for (const filter of ownerFilters) {
+      for (const filter of userFilters) {
         if (!filter.isActive) continue;
         
         let matches = true;
@@ -442,69 +335,72 @@ export class MonitoringService {
         }
       }
       
+      // If any filters matched, send notification
       if (matchingFilters.length > 0) {
-        matchedFilterInfo = `\n\n**Matched Filter(s)**: ${matchingFilters.map(f => `Filter #${f.id}`).join(', ')}`;
+        const filterInfo = matchingFilters.map(f => `Filter #${f.id}`).join(', ');
+        await this.sendRestockNotification(product, region, restocks[0], userId, filterInfo);
       }
-    } catch (error) {
-      console.error('[MonitoringService] Error checking filters:', error);
     }
 
-    // Send notification to owner via Manus built-in notification
-    try {
-      const notificationTitle = `🎉 Hermès Restock Alert: ${product.name}`;
-      const notificationContent = `
+    console.log(`[MonitoringService] Queued notifications for product ${productId}`);
+  }
+
+  /**
+   * Send restock notification to user
+   */
+  private async sendRestockNotification(
+    product: any,
+    region: any,
+    restock: any,
+    userId: number,
+    matchInfo: string
+  ) {
+    const db = await getDb();
+    if (!db) return;
+
+    // For owner (user ID 1), send via Manus notification
+    if (userId === 1) {
+      try {
+        const notificationTitle = `🎉 Hermès Restock Alert: ${product.name}`;
+        const notificationContent = `
 **Region**: ${region.name} (${region.code})
 **Product**: ${product.name}
 ${product.color ? `**Color**: ${product.color}` : ''}
 ${product.size ? `**Size**: ${product.size}` : ''}
-${product.price ? `**Price**: ${product.currency} ${product.price}` : ''}${matchedFilterInfo}
+${product.price ? `**Price**: ${product.currency} ${product.price}` : ''}
+
+**Matched**: ${matchInfo}
 
 **Product URL**: ${region.url}
 
 Detected at: ${new Date().toLocaleString()}
-      `.trim();
+        `.trim();
 
-      const notificationSent = await notifyOwner({
-        title: notificationTitle,
-        content: notificationContent,
-      });
+        const notificationSent = await notifyOwner({
+          title: notificationTitle,
+          content: notificationContent,
+        });
 
-      if (notificationSent) {
-        console.log(`[MonitoringService] ✅ Owner notification sent for product ${productId}`);
-        
-        // Update restock record
-        await db
-          .update(restockHistory)
-          .set({
-            wasNotified: true,
-            notificationCount: 1,
-          })
-          .where(eq(restockHistory.id, restocks[0].id));
-      } else {
-        console.log(`[MonitoringService] ⚠️ Failed to send owner notification for product ${productId}`);
+        if (notificationSent) {
+          console.log(`[MonitoringService] ✅ Owner notification sent for product ${product.id}`);
+          
+          // Update restock record
+          await db
+            .update(restockHistory)
+            .set({
+              wasNotified: true,
+              notificationCount: 1,
+            })
+            .where(eq(restockHistory.id, restock.id));
+        } else {
+          console.log(`[MonitoringService] ⚠️ Failed to send owner notification for product ${product.id}`);
+        }
+      } catch (error) {
+        console.error('[MonitoringService] Error sending owner notification:', error);
       }
-    } catch (error) {
-      console.error('[MonitoringService] Error sending owner notification:', error);
     }
-
-    // In production, this would also:
-    // 1. Find all users monitoring this region
-    // 2. Check their product filters (OR logic between filters, AND within each filter):
-    //    For each user, get all their active filters
-    //    A product matches if it satisfies ANY filter (OR logic)
-    //    Within each filter, ALL conditions must match (AND logic):
-    //      - If categoryId is set, product.categoryId must equal filter.categoryId
-    //      - If colors array is set, product.color must be in the array
-    //      - If sizes array is set, product.size must be in the array
-    //      - If minPrice is set, product.price must be >= minPrice
-    //      - If maxPrice is set, product.price must be <= maxPrice
-    //      - If keywords is set, product name/description must contain keywords
-    //    Example: User has Filter #1 (Lindy) OR Filter #2 (Birkin + Gold)
-    //             Product matches if it's Lindy OR (Birkin AND Gold)
-    // 3. Create notification records for matching users
-    // 4. Send emails/push notifications via notification service
-
-    console.log(`[MonitoringService] Queued notifications for product ${productId}`);
+    
+    // For other users, would send via email/push (not implemented yet)
   }
 
   /**
@@ -532,35 +428,6 @@ Detected at: ${new Date().toLocaleString()}
     };
 
     await db.insert(monitoringLogs).values(logData);
-  }
-
-  /**
-   * Log scan activity to scan_logs table
-   */
-  private async logScan(
-    regionId: number,
-    status: 'success' | 'failed',
-    productsFound: number,
-    newRestocks: number,
-    duration: number,
-    errorMessage?: string,
-    productDetails?: any[]
-  ) {
-    const db = await getDb();
-    if (!db) return;
-
-    const logData: InsertScanLog = {
-      regionId,
-      status,
-      productsFound,
-      newRestocks,
-      duration,
-      errorMessage: errorMessage || undefined,
-      productDetails: productDetails ? JSON.stringify(productDetails) : undefined,
-      createdAt: new Date(),
-    };
-
-    await db.insert(scanLogs).values(logData);
   }
 
   /**

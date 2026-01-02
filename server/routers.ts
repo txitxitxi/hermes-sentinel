@@ -1,7 +1,6 @@
 import { COOKIE_NAME } from "@shared/const";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { eq, and } from "drizzle-orm";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
@@ -31,8 +30,6 @@ import {
   subscriptions,
   monitoringConfigs,
   productFilters,
-  scanLogs,
-  regions,
   type InsertSubscription,
   type InsertMonitoringConfig,
   type InsertProductFilter,
@@ -159,10 +156,10 @@ export const appRouter = router({
         if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database unavailable' });
 
         await db.delete(monitoringConfigs).where(
-          and(
-            eq(monitoringConfigs.id, input.configId),
-            eq(monitoringConfigs.userId, ctx.user.id)
-          )
+          z.object({ id: z.number(), userId: z.number() }).parse({ 
+            id: input.configId, 
+            userId: ctx.user.id 
+          }) as any
         );
         return { success: true };
       }),
@@ -188,6 +185,7 @@ export const appRouter = router({
         minPrice: z.number().nullable(),
         maxPrice: z.number().nullable(),
         keywords: z.string().nullable(),
+        notifyAllRestocks: z.boolean().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
@@ -201,66 +199,11 @@ export const appRouter = router({
           minPrice: input.minPrice?.toString(),
           maxPrice: input.maxPrice?.toString(),
           keywords: input.keywords,
+          notifyAllRestocks: input.notifyAllRestocks ?? false,
           isActive: true,
         };
 
         await db.insert(productFilters).values(newFilter);
-        return { success: true };
-      }),
-
-    // Update existing filter
-    updateFilter: protectedProcedure
-      .input(z.object({
-        id: z.number(),
-        categoryId: z.number().nullable(),
-        colors: z.array(z.string()).nullable(),
-        sizes: z.array(z.string()).nullable(),
-        minPrice: z.number().nullable(),
-        maxPrice: z.number().nullable(),
-        keywords: z.string().nullable(),
-        isActive: z.boolean().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        const db = await getDb();
-        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database unavailable' });
-
-        const updateData: any = {
-          categoryId: input.categoryId,
-          colors: input.colors ? JSON.stringify(input.colors) : null,
-          sizes: input.sizes ? JSON.stringify(input.sizes) : null,
-          minPrice: input.minPrice?.toString() || null,
-          maxPrice: input.maxPrice?.toString() || null,
-          keywords: input.keywords,
-        };
-
-        if (input.isActive !== undefined) {
-          updateData.isActive = input.isActive;
-        }
-
-        await db.update(productFilters)
-          .set(updateData)
-          .where(
-            and(
-              eq(productFilters.id, input.id),
-              eq(productFilters.userId, ctx.user.id)
-            )
-          );
-        return { success: true };
-      }),
-
-    // Delete filter
-    deleteFilter: protectedProcedure
-      .input(z.object({ id: z.number() }))
-      .mutation(async ({ ctx, input }) => {
-        const db = await getDb();
-        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database unavailable' });
-
-        await db.delete(productFilters).where(
-          and(
-            eq(productFilters.id, input.id),
-            eq(productFilters.userId, ctx.user.id)
-          )
-        );
         return { success: true };
       }),
   }),
@@ -336,75 +279,6 @@ export const appRouter = router({
         }
         return getRecentMonitoringLogs(input.limit);
       }),
-
-    // Monitoring service control
-    getMonitoringStatus: adminProcedure.query(async () => {
-      const { getMonitoringStatus } = await import('./monitoring-control');
-      return getMonitoringStatus();
-    }),
-
-    startMonitoring: adminProcedure.mutation(async () => {
-      const { startMonitoring } = await import('./monitoring-control');
-      return startMonitoring();
-    }),
-
-    stopMonitoring: adminProcedure.mutation(async () => {
-      const { stopMonitoring } = await import('./monitoring-control');
-      return stopMonitoring();
-    }),
-
-    // Test notification
-    sendTestNotification: adminProcedure.mutation(async () => {
-      const { notifyOwner } = await import('./_core/notification');
-      const success = await notifyOwner({
-        title: '🧪 Test Notification from Hermès Sentinel',
-        content: `This is a test notification to verify your Manus notification system is working correctly.
-
-**Sent at**: ${new Date().toLocaleString()}
-
-If you received this, your notification system is ready to alert you about Hermès restocks!`,
-      });
-      return { success, message: success ? 'Test notification sent successfully!' : 'Failed to send test notification' };
-    }),
-
-    // Get scan logs
-    getScanLogs: adminProcedure.query(async () => {
-      const db = await getDb();
-      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database unavailable' });
-
-      const logs = await db
-        .select({
-          id: scanLogs.id,
-          regionId: scanLogs.regionId,
-          regionName: regions.name,
-          status: scanLogs.status,
-          productsFound: scanLogs.productsFound,
-          newRestocks: scanLogs.newRestocks,
-          duration: scanLogs.duration,
-          errorMessage: scanLogs.errorMessage,
-          productDetails: scanLogs.productDetails,
-          createdAt: scanLogs.createdAt,
-        })
-        .from(scanLogs)
-        .leftJoin(regions, eq(scanLogs.regionId, regions.id))
-        .orderBy(scanLogs.createdAt)
-        .limit(100);
-      return logs;
-    }),
-
-    // Manual scan trigger
-    manualScan: adminProcedure.mutation(async () => {
-      const { getMonitoringService } = await import('./monitoring-service');
-      const service = getMonitoringService();
-      
-      try {
-        await service.manualScan();
-        return { success: true, message: 'Manual scan started successfully' };
-      } catch (error) {
-        console.error('[Admin] Manual scan error:', error);
-        return { success: false, message: error instanceof Error ? error.message : 'Failed to start manual scan' };
-      }
-    }),
   }),
 });
 

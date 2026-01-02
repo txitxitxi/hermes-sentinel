@@ -1,9 +1,0 @@
-{
-  "query": "\n-- First, create or update a lifetime free plan\nINSERT INTO subscription_plans (name, description, price, duration_days, features, max_regions, max_products, notification_channels, is_active, created_at)\nVALUES (\n  'Lifetime Free',\n  'Lifetime free access for owner - unlimited features',\n  '0',\n  36500,\n  '[\"unlimited_regions\",\"unlimited_products\",\"email_notifications\",\"push_notifications\",\"priority_support\"]',\n  999,\n  999,\n  '[\"email\",\"push\"]',\n  1,\n  NOW()\n)\nON DUPLICATE KEY UPDATE\n  description = 'Lifetime free access for owner - unlimited features',\n  max_regions = 999,\n  max_products = 999,\n  is_active = 1;\n",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute \n-- First, create or update a lifetime free plan\nINSERT INTO subscription_plans (name, description, price, duration_days, features, max_regions, max_products, notification_channels, is_active, created_at)\nVALUES (\n  'Lifetime Free',\n  'Lifetime free access for owner - unlimited features',\n  '0',\n  36500,\n  '[\"unlimited_regions\",\"unlimited_products\",\"email_notifications\",\"push_notifications\",\"priority_support\"]',\n  999,\n  999,\n  '[\"email\",\"push\"]',\n  1,\n  NOW()\n)\nON DUPLICATE KEY UPDATE\n  description = 'Lifetime free access for owner - unlimited features',\n  max_regions = 999,\n  max_products = 999,\n  is_active = 1;\n",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 68
-}
