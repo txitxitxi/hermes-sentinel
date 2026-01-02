@@ -208,7 +208,7 @@ export default function Filters() {
                     </div>
                     <div className="grid gap-2 text-sm">
                       {filter.categoryId && (
-                        <p><span className="text-muted-foreground">Category:</span> {filter.categoryId}</p>
+                        <p><span className="text-muted-foreground">Category:</span> {categories?.find(c => c.id === filter.categoryId)?.name || `ID: ${filter.categoryId}`}</p>
                       )}
                       {filter.colors && (
                         <p><span className="text-muted-foreground">Colors:</span> {filter.colors}</p>

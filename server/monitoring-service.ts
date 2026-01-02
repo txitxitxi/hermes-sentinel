@@ -298,7 +298,13 @@ Detected at: ${new Date().toLocaleString()}
 
     // In production, this would also:
     // 1. Find all users monitoring this region
-    // 2. Check their product filters
+    // 2. Check their product filters (AND logic: ALL conditions must match)
+    //    - If categoryId is set, product.categoryId must equal filter.categoryId
+    //    - If colors array is set, product.color must be in the array
+    //    - If sizes array is set, product.size must be in the array
+    //    - If minPrice is set, product.price must be >= minPrice
+    //    - If maxPrice is set, product.price must be <= maxPrice
+    //    - If keywords is set, product name/description must contain keywords
     // 3. Create notification records for matching users
     // 4. Send emails/push notifications via notification service
 

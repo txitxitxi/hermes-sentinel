@@ -101,3 +101,10 @@
 - [x] Fix "Add to Monitoring" button not working
 - [x] Test adding regions functionality
 - [x] Verify subscription plan limits are correctly applied
+
+## Bu## Bug Fix: Delete Country and Filter Display Issues
+- [x] Fix delete country button not working
+- [x] Fix filter category displaying index instead of name
+- [x] Document filter logic (AND vs OR)
+- [x] Test delete functionality
+- [x] Test filter displayll fixes

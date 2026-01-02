@@ -1,6 +1,7 @@
 import { COOKIE_NAME } from "@shared/const";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { eq, and } from "drizzle-orm";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
@@ -156,10 +157,10 @@ export const appRouter = router({
         if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database unavailable' });
 
         await db.delete(monitoringConfigs).where(
-          z.object({ id: z.number(), userId: z.number() }).parse({ 
-            id: input.configId, 
-            userId: ctx.user.id 
-          }) as any
+          and(
+            eq(monitoringConfigs.id, input.configId),
+            eq(monitoringConfigs.userId, ctx.user.id)
+          )
         );
         return { success: true };
       }),
