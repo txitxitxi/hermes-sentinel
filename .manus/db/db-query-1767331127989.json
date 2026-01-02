@@ -1,0 +1,35 @@
+{
+  "query": "\nSELECT id, name, max_regions FROM subscription_plans;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute \nSELECT id, name, max_regions FROM subscription_plans;\n",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Free Trial",
+      "max_regions": "1"
+    },
+    {
+      "id": "2",
+      "name": "Basic Plan",
+      "max_regions": "3"
+    },
+    {
+      "id": "3",
+      "name": "Premium Plan",
+      "max_regions": "10"
+    },
+    {
+      "id": "4",
+      "name": "Annual Plan",
+      "max_regions": "15"
+    },
+    {
+      "id": "30001",
+      "name": "Lifetime Free",
+      "max_regions": "999"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tmax_regions\n1\tFree Trial\t1\n2\tBasic Plan\t3\n3\tPremium Plan\t10\n4\tAnnual Plan\t15\n30001\tLifetime Free\t999\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

@@ -1,0 +1,30 @@
+{
+  "query": "\nSELECT id, name FROM subscription_plans;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute \nSELECT id, name FROM subscription_plans;\n",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Free Trial"
+    },
+    {
+      "id": "2",
+      "name": "Basic Plan"
+    },
+    {
+      "id": "3",
+      "name": "Premium Plan"
+    },
+    {
+      "id": "4",
+      "name": "Annual Plan"
+    },
+    {
+      "id": "30001",
+      "name": "Lifetime Free"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\n1\tFree Trial\n2\tBasic Plan\n3\tPremium Plan\n4\tAnnual Plan\n30001\tLifetime Free\n",
+  "stderr": "",
+  "execution_time_ms": 96
+}
