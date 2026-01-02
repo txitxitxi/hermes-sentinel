@@ -282,13 +282,24 @@ export async function getUserNotifications(userId: number, limit = 50): Promise<
 }
 
 // Monitoring log queries
-export async function getRecentMonitoringLogs(limit = 100): Promise<MonitoringLog[]> {
+export async function getRecentMonitoringLogs(limit = 100): Promise<any[]> {
   const db = await getDb();
   if (!db) return [];
 
   return db
-    .select()
+    .select({
+      id: monitoringLogs.id,
+      regionId: monitoringLogs.regionId,
+      regionName: regions.name,
+      status: monitoringLogs.status,
+      productsFound: monitoringLogs.productsFound,
+      newRestocks: monitoringLogs.newRestocks,
+      duration: monitoringLogs.duration,
+      errorMessage: monitoringLogs.errorMessage,
+      createdAt: monitoringLogs.createdAt,
+    })
     .from(monitoringLogs)
+    .leftJoin(regions, eq(monitoringLogs.regionId, regions.id))
     .orderBy(desc(monitoringLogs.createdAt))
     .limit(limit);
 }

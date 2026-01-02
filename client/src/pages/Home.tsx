@@ -4,10 +4,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Bell, Globe, Filter, TrendingUp, Shield, Zap } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
+import { trpc } from "@/lib/trpc";
+import { useEffect } from "react";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
+  const { data: subscription } = trpc.subscription.getCurrent.useQuery(undefined, {
+    enabled: isAuthenticated,
+  });
+
+  // Auto-redirect subscribed users to dashboard
+  useEffect(() => {
+    if (isAuthenticated && subscription) {
+      setLocation("/dashboard");
+    }
+  }, [isAuthenticated, subscription, setLocation]);
 
   const handleGetStarted = () => {
     if (isAuthenticated) {

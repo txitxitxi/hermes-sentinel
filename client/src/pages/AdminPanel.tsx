@@ -43,6 +43,12 @@ export default function AdminPanel() {
     },
   });
 
+  const clearScanLogs = (trpc.admin as any).clearScanLogs.useMutation({
+    onSuccess: () => {
+      refetchScanLogs();
+    },
+  });
+
   // Redirect if not admin
   if (user && user.role !== 'admin') {
     setLocation("/dashboard");
@@ -123,7 +129,7 @@ export default function AdminPanel() {
                 <Button
                   size="sm"
                   variant="secondary"
-                  disabled={!monitoringStatus?.isRunning || manualScan.isPending}
+                  disabled={manualScan.isPending}
                   onClick={() => manualScan.mutate()}
                 >
                   <RefreshCw className="h-4 w-4 mr-1" />
@@ -290,13 +296,27 @@ export default function AdminPanel() {
                   Detailed records of each monitoring scan execution
                 </CardDescription>
               </div>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => refetchScanLogs()}
-              >
-                <RefreshCw className="h-4 w-4" />
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => refetchScanLogs()}
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => {
+                    if (confirm('Are you sure you want to clear all scan logs? This action cannot be undone.')) {
+                      clearScanLogs.mutate();
+                    }
+                  }}
+                  disabled={clearScanLogs.isPending}
+                >
+                  Clear History
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -319,7 +339,7 @@ export default function AdminPanel() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <p className="font-medium">Region ID: {log.regionId}</p>
+                        <p className="font-medium">{log.regionName || `Region ID: ${log.regionId}`}</p>
                         <Badge 
                           variant={log.status === 'success' ? 'default' : 'destructive'}
                         >
@@ -378,7 +398,7 @@ export default function AdminPanel() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <p className="font-medium">Region ID: {log.regionId}</p>
+                        <p className="font-medium">{log.regionName || `Region ID: ${log.regionId}`}</p>
                         <Badge 
                           variant={
                             log.status === 'success' ? 'default' : 

@@ -356,6 +356,13 @@ export const appRouter = router({
       return { success: true, message: 'Manual scan completed successfully' };
     }),
 
+    // Clear scan logs
+    clearScanLogs: adminProcedure.mutation(async () => {
+      const db = getDb();
+      await db.delete(monitoringLogs);
+      return { success: true, message: 'Scan logs cleared successfully' };
+    }),
+
     // Send test notification
     sendTestNotification: adminProcedure.mutation(async () => {
       const success = await notifyOwner({

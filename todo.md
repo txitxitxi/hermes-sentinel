@@ -103,3 +103,9 @@
 - [x] Add type assertions to bypass tRPC type caching issues
 - [x] Fix TypeScript compilation (0 errors)
 - [x] Fix "Monitoring System Logs" showing "Region ID" - getScanLogs now joins regions table to return regionName
+
+## Bug Fixes: Multiple Admin Panel and Navigation Issues
+- [x] Fix home page not redirecting subscribed users to dashboard
+- [x] Enable Manual Scan button (removed isRunning dependency)
+- [x] Fix scan history showing region IDs instead of region names (updated both getScanLogs and getRecentMonitoringLogs to join regions table)
+- [x] Add "Clear History" button to scan logs section (with confirmation dialog)
