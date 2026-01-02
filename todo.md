@@ -145,3 +145,11 @@
 - [x] Update regions table to set is_active=false for all regions except United States
 - [x] Verify monitoring service only scans active regions
 - [x] Test manual scan with US-only configuration (completed in ~12 seconds, detected 25 products)
+
+
+## Bug Fixes: Region Filtering, Puppeteer Cache, and UI Issues
+- [x] Fix region filtering - system still scanning Taiwan despite is_active=false (SQL UPDATE fixed)
+- [x] Fix Puppeteer cache path error (/root/.cache/puppeteer vs /home/ubuntu/.cache/puppeteer) (added PUPPETEER_CACHE_DIR env var)
+- [x] Remove redundant "Scan Activity Logs" section from Admin Panel
+- [x] Move "Clear History" button from Scan Activity Logs to Monitoring System Logs section
+- [x] Verify only US region is scanned after fixes (confirmed: only 1 scan log for US, 25 products detected)

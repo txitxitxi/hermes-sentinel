@@ -286,94 +286,29 @@ export default function AdminPanel() {
           </CardContent>
         </Card>
 
-        {/* Scan Logs - Detailed Activity */}
+        {/* Monitoring Logs */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Scan Activity Logs</CardTitle>
+                <CardTitle>Monitoring System Logs</CardTitle>
                 <CardDescription>
-                  Detailed records of each monitoring scan execution
+                  Recent monitoring activity and status
                 </CardDescription>
               </div>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => refetchScanLogs()}
-                >
-                  <RefreshCw className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => {
-                    if (confirm('Are you sure you want to clear all scan logs? This action cannot be undone.')) {
-                      clearScanLogs.mutate();
-                    }
-                  }}
-                  disabled={clearScanLogs.isPending}
-                >
-                  Clear History
-                </Button>
-              </div>
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={() => {
+                  if (confirm('Are you sure you want to clear all monitoring logs? This action cannot be undone.')) {
+                    clearScanLogs.mutate();
+                  }
+                }}
+                disabled={clearScanLogs.isPending}
+              >
+                Clear History
+              </Button>
             </div>
-          </CardHeader>
-          <CardContent>
-            {scanLogsLoading ? (
-              <p className="text-sm text-muted-foreground">Loading scan logs...</p>
-            ) : scanLogs && scanLogs.length > 0 ? (
-              <div className="space-y-3">
-                {scanLogs.slice(0, 20).map((log: any) => (
-                  <div 
-                    key={log.id} 
-                    className="flex items-start gap-3 border-b border-border pb-3 last:border-0"
-                  >
-                    <div className="mt-1">
-                      {log.status === 'success' && (
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      )}
-                      {log.status === 'failed' && (
-                        <XCircle className="h-4 w-4 text-red-500" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <p className="font-medium">{log.regionName || `Region ID: ${log.regionId}`}</p>
-                        <Badge 
-                          variant={log.status === 'success' ? 'default' : 'destructive'}
-                        >
-                          {log.status}
-                        </Badge>
-                      </div>
-                      <div className="text-sm text-muted-foreground mt-1 space-y-1">
-                        <div className="flex items-center gap-4">
-                          <span>🔍 Products Found: <strong>{log.productsFound}</strong></span>
-                          <span>🆕 New Restocks: <strong className="text-green-600">{log.newRestocks}</strong></span>
-                          <span>⏱️ Duration: {log.duration}ms</span>
-                        </div>
-                        <p className="text-xs">{new Date(log.createdAt).toLocaleString()}</p>
-                        {log.errorMessage && (
-                          <p className="text-red-500 text-xs mt-1">❌ Error: {log.errorMessage}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">No scan logs available. Start monitoring to see activity.</p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Monitoring Logs */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Monitoring System Logs</CardTitle>
-            <CardDescription>
-              Recent monitoring activity and status
-            </CardDescription>
           </CardHeader>
           <CardContent>
             {logsLoading ? (

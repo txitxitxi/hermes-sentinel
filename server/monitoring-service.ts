@@ -29,6 +29,11 @@ import {
 } from '../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
 import puppeteer from 'puppeteer';
+import { homedir } from 'os';
+import { join } from 'path';
+
+// Set Puppeteer cache directory to avoid /root/.cache issues
+process.env.PUPPETEER_CACHE_DIR = join(homedir(), '.cache', 'puppeteer');
 
 /**
  * MonitoringService handles the core monitoring logic
