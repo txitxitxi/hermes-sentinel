@@ -217,6 +217,7 @@ export const scanLogs = mysqlTable("scan_logs", {
   newRestocks: int("new_restocks").default(0),
   duration: int("duration").notNull(), // in milliseconds
   errorMessage: text("error_message"),
+  productDetails: text("product_details"), // JSON string of detected products
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

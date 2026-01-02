@@ -1,0 +1,9 @@
+{
+  "query": "SELECT p.*, pc.name as category_name, rh.detected_at, rh.was_notified\nFROM products p\nLEFT JOIN product_categories pc ON p.category_id = pc.id\nLEFT JOIN restock_history rh ON p.id = rh.product_id\nWHERE p.last_seen_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)\nORDER BY rh.detected_at DESC\nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute SELECT p.*, pc.name as category_name, rh.detected_at, rh.was_notified\nFROM products p\nLEFT JOIN product_categories pc ON p.category_id = pc.id\nLEFT JOIN restock_history rh ON p.id = rh.product_id\nWHERE p.last_seen_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)\nORDER BY rh.detected_at DESC\nLIMIT 5;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 60
+}

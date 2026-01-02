@@ -1,3 +1,4 @@
+import React from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +18,7 @@ type ScanLog = {
   newRestocks: number;
   duration: number;
   errorMessage: string | null;
+  productDetails: string | null;
   createdAt: Date;
 };
 
@@ -35,6 +37,7 @@ type MonitoringLog = {
 export default function AdminPanel() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
+  const [expandedLogId, setExpandedLogId] = React.useState<number | null>(null);
   
   const { data: stats, isLoading: statsLoading } = trpc.admin.getStats.useQuery();
   const { data: users, isLoading: usersLoading } = trpc.admin.getUsers.useQuery({ limit: 50 });
@@ -361,6 +364,41 @@ export default function AdminPanel() {
                         <p className="text-xs">{new Date(log.createdAt).toLocaleString()}</p>
                         {log.errorMessage && (
                           <p className="text-red-500 text-xs mt-1">❌ Error: {log.errorMessage}</p>
+                        )}
+                        {log.productDetails && (
+                          <div className="mt-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => setExpandedLogId(expandedLogId === log.id ? null : log.id)}
+                            >
+                              {expandedLogId === log.id ? '▼ Hide' : '▶ Show'} Detected Products
+                            </Button>
+                            {expandedLogId === log.id && (
+                              <div className="mt-2 p-3 bg-muted rounded-md text-xs">
+                                {(() => {
+                                  try {
+                                    const products = JSON.parse(log.productDetails);
+                                    return (
+                                      <div className="space-y-2">
+                                        {products.map((p: any, idx: number) => (
+                                          <div key={idx} className="border-b border-border pb-2 last:border-0">
+                                            <p><strong>Name:</strong> {p.name || 'N/A'}</p>
+                                            {p.price && <p><strong>Price:</strong> {p.currency} {p.price}</p>}
+                                            {p.productUrl && (
+                                              <p><strong>URL:</strong> <a href={p.productUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">{p.productUrl.substring(0, 50)}...</a></p>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    );
+                                  } catch (e) {
+                                    return <p className="text-red-500">Error parsing product data</p>;
+                                  }
+                                })()}
+                              </div>
+                            )}
+                          </div>
                         )}
                       </div>
                     </div>

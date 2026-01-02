@@ -211,7 +211,7 @@ export class MonitoringService {
 
       // Log successful scan
       const duration = Date.now() - startTime;
-      await this.logScan(region.id, 'success', productsFound, newRestocks, duration);
+      await this.logScan(region.id, 'success', productsFound, newRestocks, duration, undefined, scrapedProducts);
 
       if (newRestocks > 0) {
         console.log(`[MonitoringService] Found ${newRestocks} new restocks in ${region.name}`);
@@ -543,7 +543,8 @@ Detected at: ${new Date().toLocaleString()}
     productsFound: number,
     newRestocks: number,
     duration: number,
-    errorMessage?: string
+    errorMessage?: string,
+    productDetails?: any[]
   ) {
     const db = await getDb();
     if (!db) return;
@@ -555,6 +556,7 @@ Detected at: ${new Date().toLocaleString()}
       newRestocks,
       duration,
       errorMessage: errorMessage || undefined,
+      productDetails: productDetails ? JSON.stringify(productDetails) : undefined,
       createdAt: new Date(),
     };
 

@@ -178,3 +178,13 @@
 - [x] Verify monitoring configs - already only United States is active
 - [x] Confirm only one region is active for monitoring (user: tianyuxi888@gmail.com)
 - [x] System already optimized - only United States in 30-second scan cycle
+
+## Feature: Show Detected Products in Scan Logs
+- [x] Add detected product details to scan log records
+- [x] Extend scanLogs table with productDetails JSON field
+- [x] Update monitoring service to store scraped products in logs
+- [x] Display detected products in Admin Panel with expand/collapse
+- [x] Add getScanLogs API to return productDetails
+- [x] Create documentation explaining product/restock definitions
+- [ ] Review current scraping selectors and improve accuracy
+- [ ] Test with real scan to see detected products

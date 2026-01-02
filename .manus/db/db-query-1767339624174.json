@@ -1,0 +1,52 @@
+{
+  "query": "SELECT pf.*, pc.name as category_name \nFROM product_filters pf \nLEFT JOIN product_categories pc ON pf.category_id = pc.id \nWHERE pf.user_id = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute SELECT pf.*, pc.name as category_name \nFROM product_filters pf \nLEFT JOIN product_categories pc ON pf.category_id = pc.id \nWHERE pf.user_id = 1;",
+  "rows": [
+    {
+      "id": "1",
+      "user_id": "1",
+      "category_id": "8",
+      "colors": "NULL",
+      "sizes": "NULL",
+      "min_price": "NULL",
+      "max_price": "NULL",
+      "keywords": "NULL",
+      "is_active": "1",
+      "created_at": "2026-01-02 05:32:48",
+      "updated_at": "2026-01-02 05:32:48",
+      "category_name": "Lindy"
+    },
+    {
+      "id": "30001",
+      "user_id": "1",
+      "category_id": "1",
+      "colors": "[\"Gold\"]",
+      "sizes": "NULL",
+      "min_price": "NULL",
+      "max_price": "NULL",
+      "keywords": "NULL",
+      "is_active": "1",
+      "created_at": "2026-01-02 06:06:51",
+      "updated_at": "2026-01-02 06:06:51",
+      "category_name": "Birkin"
+    },
+    {
+      "id": "30005",
+      "user_id": "1",
+      "category_id": "NULL",
+      "colors": "NULL",
+      "sizes": "NULL",
+      "min_price": "NULL",
+      "max_price": "NULL",
+      "keywords": "Faubourg Express bag",
+      "is_active": "1",
+      "created_at": "2026-01-02 06:32:26",
+      "updated_at": "2026-01-02 06:32:26",
+      "category_name": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuser_id\tcategory_id\tcolors\tsizes\tmin_price\tmax_price\tkeywords\tis_active\tcreated_at\tupdated_at\tcategory_name\n1\t1\t8\tNULL\tNULL\tNULL\tNULL\tNULL\t1\t2026-01-02 05:32:48\t2026-01-02 05:32:48\tLindy\n30001\t1\t1\t[\"Gold\"]\tNULL\tNULL\tNULL\tNULL\t1\t2026-01-02 06:06:51\t2026-01-02 06:06:51\tBirkin\n30005\t1\tNULL\tNULL\tNULL\tNULL\tNULL\tFaubourg Express bag\t1\t2026-01-02 06:32:26\t2026-01-02 06:32:26\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

@@ -382,6 +382,7 @@ If you received this, your notification system is ready to alert you about Herm√
           newRestocks: scanLogs.newRestocks,
           duration: scanLogs.duration,
           errorMessage: scanLogs.errorMessage,
+          productDetails: scanLogs.productDetails,
           createdAt: scanLogs.createdAt,
         })
         .from(scanLogs)
