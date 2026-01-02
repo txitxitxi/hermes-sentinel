@@ -30,10 +30,15 @@ import {
   subscriptions,
   monitoringConfigs,
   productFilters,
+  monitoringLogs,
+  regions,
   type InsertSubscription,
   type InsertMonitoringConfig,
   type InsertProductFilter,
 } from "../drizzle/schema";
+import { getMonitoringService } from "./monitoring-service";
+import { notifyOwner } from "./_core/notification";
+import { eq, desc } from "drizzle-orm";
 
 // Admin-only procedure
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -279,6 +284,91 @@ export const appRouter = router({
         }
         return getRecentMonitoringLogs(input.limit);
       }),
+
+    // Get scan logs (using monitoringLogs table)
+    getScanLogs: adminProcedure
+      .input(z.object({ limit: z.number().default(100) }))
+      .query(async ({ input }) => {
+        const db = getDb();
+        const logs = await db
+          .select({
+            id: monitoringLogs.id,
+            regionId: monitoringLogs.regionId,
+            regionName: regions.name,
+            productsFound: monitoringLogs.productsFound,
+            newRestocks: monitoringLogs.newRestocks,
+            duration: monitoringLogs.duration,
+            status: monitoringLogs.status,
+            errorMessage: monitoringLogs.errorMessage,
+            createdAt: monitoringLogs.createdAt,
+          })
+          .from(monitoringLogs)
+          .leftJoin(regions, eq(monitoringLogs.regionId, regions.id))
+          .orderBy(desc(monitoringLogs.createdAt))
+          .limit(input.limit);
+        return logs;
+      }),
+
+    // Get monitoring service status
+    getMonitoringStatus: adminProcedure.query(async () => {
+      const monitoringService = getMonitoringService();
+      const isRunning = monitoringService.isRunning();
+      const uptime = monitoringService.getUptime();
+      const db = getDb();
+      
+      const [activeConfigs, totalRestocks] = await Promise.all([
+        db.select().from(monitoringConfigs).where(eq(monitoringConfigs.isActive, true)),
+        getTotalRestockCount(),
+      ]);
+
+      return {
+        isRunning,
+        uptime,
+        totalRegionsMonitored: activeConfigs.length,
+        totalRestocksDetected: totalRestocks,
+      };
+    }),
+
+    // Start monitoring service
+    startMonitoring: adminProcedure.mutation(async () => {
+      const monitoringService = getMonitoringService();
+      if (monitoringService.isRunning()) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Monitoring service is already running' });
+      }
+      await monitoringService.start();
+      return { success: true, message: 'Monitoring service started successfully' };
+    }),
+
+    // Stop monitoring service
+    stopMonitoring: adminProcedure.mutation(async () => {
+      const monitoringService = getMonitoringService();
+      if (!monitoringService.isRunning()) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Monitoring service is not running' });
+      }
+      await monitoringService.stop();
+      return { success: true, message: 'Monitoring service stopped successfully' };
+    }),
+
+    // Manual scan
+    manualScan: adminProcedure.mutation(async () => {
+      const monitoringService = getMonitoringService();
+      await monitoringService.runManualScan();
+      return { success: true, message: 'Manual scan completed successfully' };
+    }),
+
+    // Send test notification
+    sendTestNotification: adminProcedure.mutation(async () => {
+      const success = await notifyOwner({
+        title: '🧪 Test Notification',
+        content: 'This is a test notification from Hermès Sentinel Admin Panel. If you see this, notifications are working correctly!',
+      });
+      
+      if (!success) {
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to send notification' });
+      }
+      
+      return { success: true, message: 'Test notification sent successfully' };
+    }),
   }),
 });
 

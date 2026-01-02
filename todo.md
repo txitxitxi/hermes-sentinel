@@ -93,3 +93,13 @@
 - [x] Add role-based rendering for admin menu items
 - [x] Import missing icons (Filter, History, CreditCard, Shield)
 - [x] Verify all navigation links work correctly
+
+## Bug Fix: Admin Panel Missing Control Section and Region ID Display
+- [x] Restore "Monitoring Service Control" card with Start/Stop/Manual Scan buttons
+- [x] Restore AdminPanel.tsx from checkpoint 78513ba (had full monitoring controls)
+- [x] Add all missing admin API mutations to routers.ts (getScanLogs, getMonitoringStatus, startMonitoring, stopMonitoring, manualScan, sendTestNotification)
+- [x] Fix import errors (getMonitoringService from monitoring-service.ts)
+- [x] Use monitoringLogs table instead of non-existent scanLogs table
+- [x] Add type assertions to bypass tRPC type caching issues
+- [x] Fix TypeScript compilation (0 errors)
+- [x] Fix "Monitoring System Logs" showing "Region ID" - getScanLogs now joins regions table to return regionName
