@@ -152,3 +152,9 @@
 - [x] Implement getScanLogs API endpoint (admin.getScanLogs)
 - [x] Test log display and manual refresh functionality
 - [x] Write unit tests (8/9 tests passing, 1 timeout due to Puppeteer)
+
+## Bug Fix: Manual Scan Button Availability
+- [x] Remove restriction that disables Manual Scan when service is stopped
+- [x] Allow Manual Scan to work independently of monitoring service status
+- [x] Test Manual Scan works when service is stopped
+- [x] Verify Manual Scan still works when service is running

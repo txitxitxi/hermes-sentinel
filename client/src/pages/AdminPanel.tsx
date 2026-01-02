@@ -123,7 +123,7 @@ export default function AdminPanel() {
                 <Button
                   size="sm"
                   variant="secondary"
-                  disabled={!monitoringStatus?.isRunning || manualScan.isPending}
+                  disabled={manualScan.isPending}
                   onClick={() => manualScan.mutate()}
                 >
                   <RefreshCw className="h-4 w-4 mr-1" />
