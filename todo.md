@@ -108,3 +108,9 @@
 - [x] Document filter logic (AND vs OR)
 - [x] Test delete functionality
 - [x] Test filter displayll fixes
+
+## Feature: Update Filter Logic
+- [x] Update filter matching logic: multiple filters use OR, within each filter use AND
+- [x] Update documentation in monitoring-service.ts
+- [x] Update test cases to reflect new logic
+- [x] Verify filter matching works correctly

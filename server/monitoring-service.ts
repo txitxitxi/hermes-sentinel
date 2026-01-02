@@ -298,13 +298,18 @@ Detected at: ${new Date().toLocaleString()}
 
     // In production, this would also:
     // 1. Find all users monitoring this region
-    // 2. Check their product filters (AND logic: ALL conditions must match)
-    //    - If categoryId is set, product.categoryId must equal filter.categoryId
-    //    - If colors array is set, product.color must be in the array
-    //    - If sizes array is set, product.size must be in the array
-    //    - If minPrice is set, product.price must be >= minPrice
-    //    - If maxPrice is set, product.price must be <= maxPrice
-    //    - If keywords is set, product name/description must contain keywords
+    // 2. Check their product filters (OR logic between filters, AND within each filter):
+    //    For each user, get all their active filters
+    //    A product matches if it satisfies ANY filter (OR logic)
+    //    Within each filter, ALL conditions must match (AND logic):
+    //      - If categoryId is set, product.categoryId must equal filter.categoryId
+    //      - If colors array is set, product.color must be in the array
+    //      - If sizes array is set, product.size must be in the array
+    //      - If minPrice is set, product.price must be >= minPrice
+    //      - If maxPrice is set, product.price must be <= maxPrice
+    //      - If keywords is set, product name/description must contain keywords
+    //    Example: User has Filter #1 (Lindy) OR Filter #2 (Birkin + Gold)
+    //             Product matches if it's Lindy OR (Birkin AND Gold)
     // 3. Create notification records for matching users
     // 4. Send emails/push notifications via notification service
 

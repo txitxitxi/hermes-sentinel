@@ -70,25 +70,29 @@ describe("filters.getCategories", () => {
 });
 
 describe("Filter Logic Documentation", () => {
-  it("should use AND logic for all filter conditions", () => {
-    // This test documents the filter matching logic
-    // All conditions must be satisfied for a product to match:
+  it("should use OR logic between filters, AND logic within each filter", () => {
+    // This test documents the filter matching logic:
+    // - Multiple filters: OR logic (match ANY filter)
+    // - Within each filter: AND logic (match ALL conditions)
     
     const filterLogic = {
-      categoryId: "product.categoryId must equal filter.categoryId",
-      colors: "product.color must be in filter.colors array",
-      sizes: "product.size must be in filter.sizes array",
-      minPrice: "product.price must be >= filter.minPrice",
-      maxPrice: "product.price must be <= filter.maxPrice",
-      keywords: "product name/description must contain filter.keywords",
+      betweenFilters: "OR",
+      withinFilter: "AND",
+      conditions: {
+        categoryId: "product.categoryId must equal filter.categoryId",
+        colors: "product.color must be in filter.colors array",
+        sizes: "product.size must be in filter.sizes array",
+        minPrice: "product.price must be >= filter.minPrice",
+        maxPrice: "product.price must be <= filter.maxPrice",
+        keywords: "product name/description must contain filter.keywords",
+      },
+      example: "Filter #1 (Lindy) OR Filter #2 (Birkin + Gold) => Product matches if it's Lindy OR (Birkin AND Gold)",
     };
 
     // Verify documentation exists
     expect(filterLogic).toBeDefined();
-    expect(Object.keys(filterLogic).length).toBe(6);
-    
-    // All conditions use AND logic
-    const logicType = "AND";
-    expect(logicType).toBe("AND");
+    expect(filterLogic.betweenFilters).toBe("OR");
+    expect(filterLogic.withinFilter).toBe("AND");
+    expect(Object.keys(filterLogic.conditions).length).toBe(6);
   });
 });
