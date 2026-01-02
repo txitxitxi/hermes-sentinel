@@ -83,6 +83,16 @@ export default function AdminPanel() {
                 <div className="flex items-center gap-2">
                   {statusLoading ? (
                     <Badge variant="outline">Loading...</Badge>
+                  ) : !monitoringStatus ? (
+                    <>
+                      <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/20">
+                        <XCircle className="h-3 w-3 mr-1" />
+                        Error
+                      </Badge>
+                      <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/20">
+                        🚫 Status Unavailable
+                      </Badge>
+                    </>
                   ) : monitoringStatus?.isRunning ? (
                     <>
                       <Badge variant="default" className="bg-green-600">

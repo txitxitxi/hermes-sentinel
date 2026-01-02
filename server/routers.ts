@@ -289,7 +289,7 @@ export const appRouter = router({
     getScanLogs: adminProcedure
       .input(z.object({ limit: z.number().default(100) }))
       .query(async ({ input }) => {
-        const db = getDb();
+        const db = await getDb();
         const logs = await db
           .select({
             id: monitoringLogs.id,
@@ -316,7 +316,7 @@ export const appRouter = router({
       const monitoringService = getMonitoringService();
       const isRunning = monitoringService.isRunning();
       const uptime = monitoringService.getUptime();
-      const db = getDb();
+      const db = await getDb();
       
       const [activeConfigs, totalRestocks] = await Promise.all([
         db.select().from(monitoringConfigs).where(eq(monitoringConfigs.isActive, true)),
@@ -360,7 +360,7 @@ export const appRouter = router({
 
     // Clear scan logs
     clearScanLogs: adminProcedure.mutation(async () => {
-      const db = getDb();
+      const db = await getDb();
       await db.delete(monitoringLogs);
       return { success: true, message: 'Scan logs cleared successfully' };
     }),

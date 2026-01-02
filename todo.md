@@ -302,3 +302,58 @@
 - [x] Check if Drizzle ORM is correctly handling the enum value - **WORKING**
 - [x] Verify logMonitoring is receiving 'manual' parameter - **WORKING**
 - [x] Test manual scan shows "🖱️ Manual" label in logs - **WORKING** (issue was missing scanType in getRecentMonitoringLogs query)
+
+
+## Session 2026-01-02 Part 4: Three Critical Bugs Reported by User
+
+### Bug 1: Service Status Stuck on "Loading..." in Admin Panel
+- [ ] Admin Panel shows "Loading..." for Service Status indefinitely
+- [ ] Dashboard correctly shows "Active" subscription status
+- [ ] Investigate getMonitoringStatus query timeout or error
+- [ ] Add error handling and fallback state
+- [ ] Test: Service Status should show "⭕ Stopped" or "🟢 Running" immediately
+
+### Bug 2: All Logs Showing "Manual" Instead of "Auto"
+- [ ] All recent logs show "🔘 Manual" label even for automatic scans
+- [ ] User reports auto-scan is running from Dashboard
+- [ ] Investigate why automatic scans are being logged as 'manual'
+- [ ] Check if start() method is passing correct scanType='auto' parameter
+- [ ] Test: Automatic scans should show "🤖 Auto" label
+
+### Bug 3: Chromium Path Error Returned
+- [ ] Multiple scan failures at 3:48:40 AM, 3:48:16 AM, 3:30:00 AM
+- [ ] Error: "Browser was not found at the configured executablePath"
+- [ ] Previous fix (import config at server startup) didn't persist
+- [ ] Investigate if server was restarted or if Chromium was deleted
+- [ ] Implement more robust solution
+- [ ] Test: Scans should succeed consistently without Chromium path errors
+
+
+## Session 2026-01-02 Part 4: Fix Service Status Loading Issue
+
+### Root Cause: Missing `await` on `getDb()` Async Function
+**Problem**: Service Status stuck on "Loading..." in Admin Panel
+
+**Investigation**:
+- getMonitoringStatus query was timing out/failing silently
+- Console logs showed: `TypeError: db.select is not a function`
+- Root cause: `getDb()` is an async function but was called without `await`
+- When you call an async function without await, you get a Promise object, not the actual database connection
+- Promise objects don't have `.select()` method, causing the error
+
+**Solution**:
+- [x] Fixed getMonitoringStatus: `const db = await getDb();` (line 319 in routers.ts)
+- [x] Fixed getScanLogs: `const db = await getDb();` (line 292 in routers.ts)
+- [x] Fixed clearScanLogs: `const db = await getDb();` (line 354 in routers.ts)
+- [x] Added error handling UI to show "Error" badge when query fails
+- [x] Test Service Status displays correctly - **WORKING**
+
+**Verification**:
+- ✅ Service Status now shows "⭕ Stopped" + "🚫 Auto Scan Disabled"
+- ✅ Regions Monitored: 1 (correct)
+- ✅ Restocks Detected: 25 (correct)
+- ✅ No more "Loading..." stuck state
+
+**Files Modified**:
+- `server/routers.ts` (added await to 3 getDb() calls)
+- `client/src/pages/AdminPanel.tsx` (added error handling UI)
