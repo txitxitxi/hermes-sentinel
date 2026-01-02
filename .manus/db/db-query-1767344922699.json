@@ -1,0 +1,110 @@
+{
+  "query": "SELECT id, region_id, external_id, name, price, currency, color, is_available FROM products LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute SELECT id, region_id, external_id, name, price, currency, color, is_available FROM products LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "region_id": "1",
+      "external_id": "H086410CK18",
+      "name": "Faubourg Express bag",
+      "price": "11100.00",
+      "currency": "USD",
+      "color": "Beige/Natural",
+      "is_available": "1"
+    },
+    {
+      "id": "2",
+      "region_id": "1",
+      "external_id": "H085957CKS3",
+      "name": "Lindy II mini bag",
+      "price": "8850.00",
+      "currency": "USD",
+      "color": "Red",
+      "is_available": "1"
+    },
+    {
+      "id": "3",
+      "region_id": "1",
+      "external_id": "H084274CCCB",
+      "name": "Hermès In-the-Loop 18 bag",
+      "price": "5250.00",
+      "currency": "USD",
+      "color": "Red",
+      "is_available": "1"
+    },
+    {
+      "id": "4",
+      "region_id": "1",
+      "external_id": "H084987CKAB",
+      "name": "In-the-Loop plush belt bag",
+      "price": "7950.00",
+      "currency": "USD",
+      "color": "Grey",
+      "is_available": "1"
+    },
+    {
+      "id": "5",
+      "region_id": "1",
+      "external_id": "H073444CKS3",
+      "name": "Bolide 1923 mini bag",
+      "price": "7100.00",
+      "currency": "USD",
+      "color": "Red",
+      "is_available": "1"
+    },
+    {
+      "id": "6",
+      "region_id": "1",
+      "external_id": "H056289CK3G",
+      "name": "Picotin Lock 18 bag",
+      "price": "3725.00",
+      "currency": "USD",
+      "color": "Beige/Natural",
+      "is_available": "1"
+    },
+    {
+      "id": "7",
+      "region_id": "1",
+      "external_id": "H085408CKAT",
+      "name": "Hermès Geta bag",
+      "price": "7250.00",
+      "currency": "USD",
+      "color": "Orange",
+      "is_available": "1"
+    },
+    {
+      "id": "8",
+      "region_id": "1",
+      "external_id": "H085933CKAB",
+      "name": "Silkycity 33 bag",
+      "price": "2900.00",
+      "currency": "USD",
+      "color": "Multi-colored",
+      "is_available": "1"
+    },
+    {
+      "id": "9",
+      "region_id": "1",
+      "external_id": "H085945CKBY",
+      "name": "Evelyne 16 Amazone bag",
+      "price": "2425.00",
+      "currency": "USD",
+      "color": "White",
+      "is_available": "1"
+    },
+    {
+      "id": "10",
+      "region_id": "1",
+      "external_id": "H087974CKAA",
+      "name": "Neo Garden 23 bredies bag",
+      "price": "7300.00",
+      "currency": "USD",
+      "color": "Orange",
+      "is_available": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tregion_id\texternal_id\tname\tprice\tcurrency\tcolor\tis_available\n1\t1\tH086410CK18\tFaubourg Express bag\t11100.00\tUSD\tBeige/Natural\t1\n2\t1\tH085957CKS3\tLindy II mini bag\t8850.00\tUSD\tRed\t1\n3\t1\tH084274CCCB\tHermès In-the-Loop 18 bag\t5250.00\tUSD\tRed\t1\n4\t1\tH084987CKAB\tIn-the-Loop plush belt bag\t7950.00\tUSD\tGrey\t1\n5\t1\tH073444CKS3\tBolide 1923 mini bag\t7100.00\tUSD\tRed\t1\n6\t1\tH056289CK3G\tPicotin Lock 18 bag\t3725.00\tUSD\tBeige/Natural\t1\n7\t1\tH085408CKAT\tHermès Geta bag\t7250.00\tUSD\tOrange\t1\n8\t1\tH085933CKAB\tSilkycity 33 bag\t2900.00\tUSD\tMulti-colored\t1\n9\t1\tH085945CKBY\tEvelyne 16 Amazone bag\t2425.00\tUSD\tWhite\t1\n10\t1\tH087974CKAA\tNeo Garden 23 bredies bag\t7300.00\tUSD\tOrange\t1\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

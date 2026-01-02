@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, region_id, status, products_found, new_restocks, duration, LEFT(error_message, 100) as error_preview, created_at FROM monitoring_logs WHERE status = 'success' ORDER BY created_at DESC LIMIT 3;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute SELECT id, region_id, status, products_found, new_restocks, duration, LEFT(error_message, 100) as error_preview, created_at FROM monitoring_logs WHERE status = 'success' ORDER BY created_at DESC LIMIT 3;",
+  "rows": [
+    {
+      "id": "30633",
+      "region_id": "15",
+      "status": "success",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "0",
+      "error_preview": "NULL",
+      "created_at": "2026-01-02 08:51:27"
+    },
+    {
+      "id": "30632",
+      "region_id": "14",
+      "status": "success",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "0",
+      "error_preview": "NULL",
+      "created_at": "2026-01-02 08:51:25"
+    },
+    {
+      "id": "30631",
+      "region_id": "13",
+      "status": "success",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "0",
+      "error_preview": "NULL",
+      "created_at": "2026-01-02 08:51:23"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tregion_id\tstatus\tproducts_found\tnew_restocks\tduration\terror_preview\tcreated_at\n30633\t15\tsuccess\t0\t0\t0\tNULL\t2026-01-02 08:51:27\n30632\t14\tsuccess\t0\t0\t0\tNULL\t2026-01-02 08:51:25\n30631\t13\tsuccess\t0\t0\t0\tNULL\t2026-01-02 08:51:23\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

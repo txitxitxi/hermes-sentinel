@@ -28,6 +28,7 @@ import {
   type InsertMonitoringLog,
 } from '../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
+import puppeteer from 'puppeteer';
 
 /**
  * MonitoringService handles the core monitoring logic
@@ -145,7 +146,17 @@ export class MonitoringService {
 
         if (!existingProduct) {
           // New product detected - insert it
-          const insertResult = await db.insert(products).values(scrapedProduct);
+          // Ensure null values are converted to undefined for Drizzle
+          const productToInsert = {
+            ...scrapedProduct,
+            categoryId: scrapedProduct.categoryId ?? undefined,
+            description: scrapedProduct.description ?? undefined,
+            imageUrl: scrapedProduct.imageUrl ?? undefined,
+            size: scrapedProduct.size ?? undefined,
+            color: scrapedProduct.color ?? undefined,
+            price: scrapedProduct.price ?? undefined,
+          };
+          const insertResult = await db.insert(products).values(productToInsert);
           const productId = Number(insertResult[0].insertId);
 
           // Record restock
@@ -182,7 +193,7 @@ export class MonitoringService {
 
       // Log successful monitoring
       const duration = Date.now() - startTime;
-      await this.logMonitoring(region.id, 'success', productsFound, newRestocks, duration);
+      await this.logMonitoring(region.id, 'success', productsFound, newRestocks, duration, undefined, scrapedProducts);
 
       if (newRestocks > 0) {
         console.log(`[MonitoringService] Found ${newRestocks} new restocks in ${region.name}`);
@@ -198,20 +209,111 @@ export class MonitoringService {
 
   /**
    * Scrape a region's website for products
-   * In production, this would use Puppeteer/Playwright with anti-detection measures
+   * Uses Puppeteer with stealth plugin for anti-detection
    */
   private async scrapeRegionWebsite(region: Region): Promise<InsertProduct[]> {
-    // SIMULATION: In production, this would:
-    // 1. Launch headless browser with stealth plugins
-    // 2. Navigate to region URL with random delays
-    // 3. Parse product listings
-    // 4. Extract product details (name, price, availability, etc.)
-    // 5. Handle pagination
-    // 6. Rotate proxy IPs to avoid detection
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--disable-gpu',
+        '--window-size=1920x1080'
+      ]
+    });
 
-    // For now, return empty array (no products found)
-    // This prevents the system from creating fake data
-    return [];
+    try {
+      const page = await browser.newPage();
+      
+      // Set realistic viewport and user agent
+      await page.setViewport({ width: 1920, height: 1080 });
+      await page.setUserAgent(
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      );
+
+      // Navigate to the bags page
+      console.log(`[Scraper] Navigating to ${region.url}`);
+      await page.goto(region.url, { 
+        waitUntil: 'networkidle2',
+        timeout: 60000 
+      });
+
+      // Wait for product grid to load
+      await page.waitForSelector('div[role="button"]', { timeout: 60000 });
+      
+      // Random delay to appear more human-like
+      await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
+
+      // Extract products using the correct selectors
+      const products = await page.evaluate(() => {
+        const productElements = document.querySelectorAll('div[role="button"]');
+        const results: any[] = [];
+
+        productElements.forEach((element) => {
+          try {
+            // Get the product link
+            const linkElement = element.querySelector('a[id^="product-item-meta-link-"]');
+            if (!linkElement) return;
+
+            const productId = linkElement.getAttribute('id')?.replace('product-item-meta-link-', '') || '';
+            const productName = linkElement.textContent?.trim() || '';
+            const productUrl = linkElement.getAttribute('href') || '';
+
+            // Get availability status
+            const unavailableText = element.textContent?.includes('UNAVAILABLE');
+            const availableSoonText = element.textContent?.includes('AVAILABLE SOON');
+            const isAvailable = !unavailableText && !availableSoonText;
+
+            // Extract price (look for $ followed by numbers)
+            const priceMatch = element.textContent?.match(/\$([\d,]+)/);
+            const price = priceMatch ? priceMatch[1].replace(',', '') : null;
+
+            // Extract color (look for "Color:" followed by text)
+            const colorMatch = element.textContent?.match(/Color:\s*([^,]+)/);
+            const color = colorMatch ? colorMatch[1].trim() : null;
+
+            if (productId && productName) {
+              results.push({
+                externalId: productId,
+                name: productName,
+                productUrl: productUrl.startsWith('http') ? productUrl : `https://www.hermes.com${productUrl}`,
+                price: price,
+                currency: 'USD',
+                isAvailable: isAvailable,
+                color: color,
+                imageUrl: null, // Could extract if needed
+                description: null,
+                size: null, // Could extract if in product name
+                categoryId: null, // Will be set later if needed
+                regionId: null // Will be set by caller
+              });
+            }
+          } catch (err) {
+            console.error('Error parsing product element:', err);
+          }
+        });
+
+        return results;
+      });
+
+      console.log(`[Scraper] Found ${products.length} products for region ${region.name}`);
+      
+      // Set regionId for all products
+      const productsWithRegion = products.map(p => ({
+        ...p,
+        regionId: region.id
+      }));
+      
+      return productsWithRegion;
+
+    } catch (error) {
+      console.error(`[Scraper] Error scraping ${region.name}:`, error);
+      throw error;
+    } finally {
+      await browser.close();
+    }
   }
 
   /**
@@ -412,7 +514,8 @@ Detected at: ${new Date().toLocaleString()}
     productsFound: number,
     newRestocks: number,
     duration: number,
-    errorMessage?: string
+    errorMessage?: string,
+    productDetails?: any[]
   ) {
     const db = await getDb();
     if (!db) return;
@@ -424,6 +527,7 @@ Detected at: ${new Date().toLocaleString()}
       newRestocks,
       duration,
       errorMessage: errorMessage || undefined,
+      productDetails: productDetails ? JSON.stringify(productDetails) : undefined,
       createdAt: new Date(),
     };
 

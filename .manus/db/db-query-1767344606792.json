@@ -1,0 +1,28 @@
+{
+  "query": "SELECT id, region_id, status, products_found, new_restocks, duration, error_message, created_at FROM monitoring_logs ORDER BY created_at DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute SELECT id, region_id, status, products_found, new_restocks, duration, error_message, created_at FROM monitoring_logs ORDER BY created_at DESC LIMIT 5;",
+  "rows": [],
+  "messages": [
+    "30664\t1\tfailed\t0\t0\t25388\tFailed query: insert into `products` (`id`, `region_id`, `category_id`, `external_id`, `name`, `description`, `price`, `currency`, `color`, `size`, `image_url`, `product_url`, `is_available`, `last_seen_at`, `created_at`, `updated_at`) values (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default, ?, default, default, default)",
+    "params: 1,,H086410CK18,Faubourg Express bag,,11100,USD,Beige/Natural,,,true\t2026-01-02 09:02:49",
+    "30663\t15\tfailed\t0\t0\t1\tCould not find Chrome (ver. 143.0.7499.169). This can occur if either",
+    " 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or",
+    " 2. your cache path is incorrectly configured (which is: /home/ubuntu/.cache/puppeteer).",
+    "For (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.\t2026-01-02 08:59:51",
+    "30662\t14\tfailed\t0\t0\t1\tCould not find Chrome (ver. 143.0.7499.169). This can occur if either",
+    " 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or",
+    " 2. your cache path is incorrectly configured (which is: /home/ubuntu/.cache/puppeteer).",
+    "For (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.\t2026-01-02 08:59:49",
+    "30661\t13\tfailed\t0\t0\t1\tCould not find Chrome (ver. 143.0.7499.169). This can occur if either",
+    " 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or",
+    " 2. your cache path is incorrectly configured (which is: /home/ubuntu/.cache/puppeteer).",
+    "For (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.\t2026-01-02 08:59:47",
+    "30660\t12\tfailed\t0\t0\t1\tCould not find Chrome (ver. 143.0.7499.169). This can occur if either",
+    " 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or",
+    " 2. your cache path is incorrectly configured (which is: /home/ubuntu/.cache/puppeteer).",
+    "For (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.\t2026-01-02 08:59:45"
+  ],
+  "stdout": "id\tregion_id\tstatus\tproducts_found\tnew_restocks\tduration\terror_message\tcreated_at\n30664\t1\tfailed\t0\t0\t25388\tFailed query: insert into `products` (`id`, `region_id`, `category_id`, `external_id`, `name`, `description`, `price`, `currency`, `color`, `size`, `image_url`, `product_url`, `is_available`, `last_seen_at`, `created_at`, `updated_at`) values (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default, ?, default, default, default)\nparams: 1,,H086410CK18,Faubourg Express bag,,11100,USD,Beige/Natural,,,true\t2026-01-02 09:02:49\n30663\t15\tfailed\t0\t0\t1\tCould not find Chrome (ver. 143.0.7499.169). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: /home/ubuntu/.cache/puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.\t2026-01-02 08:59:51\n30662\t14\tfailed\t0\t0\t1\tCould not find Chrome (ver. 143.0.7499.169). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: /home/ubuntu/.cache/puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.\t2026-01-02 08:59:49\n30661\t13\tfailed\t0\t0\t1\tCould not find Chrome (ver. 143.0.7499.169). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: /home/ubuntu/.cache/puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.\t2026-01-02 08:59:47\n30660\t12\tfailed\t0\t0\t1\tCould not find Chrome (ver. 143.0.7499.169). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: /home/ubuntu/.cache/puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.\t2026-01-02 08:59:45\n",
+  "stderr": "",
+  "execution_time_ms": 73
+}

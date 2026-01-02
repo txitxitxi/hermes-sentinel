@@ -300,6 +300,7 @@ export const appRouter = router({
             duration: monitoringLogs.duration,
             status: monitoringLogs.status,
             errorMessage: monitoringLogs.errorMessage,
+            productDetails: monitoringLogs.productDetails,
             createdAt: monitoringLogs.createdAt,
           })
           .from(monitoringLogs)

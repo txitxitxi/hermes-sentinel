@@ -115,3 +115,27 @@
 - [x] Added runManualScan(), isRunning(), and getUptime() methods
 - [x] Fixed naming conflict by renaming isRunning property to _isRunning
 - [x] TypeScript compilation successful with no errors
+
+## Feature: Optimize Scraping with Direct Bags Category URLs
+- [x] Update United States region URL to https://www.hermes.com/us/en/category/women/bags-and-small-leather-goods/bags-and-clutches/#|
+- [ ] Inspect bags category page HTML structure to identify correct product selectors
+- [ ] Update scraping CSS selectors in monitoring-service.ts to match actual product elements
+- [ ] Test scraping with new URL and selectors
+- [ ] Update other region URLs to their respective bags category pages (future enhancement)
+
+
+## Feature: Real Puppeteer Web Scraping Implementation
+- [x] Install Puppeteer and Chromium browser
+- [x] Implement real browser automation in scrapeRegionWebsite()
+- [x] Add correct Hermès website selectors (div[role="button"], a[id^="product-item-meta-link-"])
+- [x] Extract product data: name, price, color, availability, external_id
+- [x] Fix database field mapping (url → productUrl)
+- [x] Fix NULL value handling for optional fields (categoryId, description, etc.)
+- [x] Add productDetails field to monitoring_logs schema
+- [x] Update getScanLogs to include productDetails
+- [x] Increase selector timeout from 30s to 60s
+- [x] Test manual scan - successfully detected 25 products from US region
+- [ ] Fix "Scan Activity Logs" UI display issue (products saving correctly, just UI not showing)
+- [ ] Investigate region-specific selector differences for UK/France/Germany
+- [ ] Add image URL extraction
+- [ ] Add product category detection

@@ -1,0 +1,30 @@
+{
+  "query": "SELECT id, region_id, status, products_found, new_restocks, duration, LEFT(error_message, 50) as error_preview, created_at FROM monitoring_logs WHERE created_at > '2026-01-02 09:06:00' ORDER BY created_at DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute SELECT id, region_id, status, products_found, new_restocks, duration, LEFT(error_message, 50) as error_preview, created_at FROM monitoring_logs WHERE created_at > '2026-01-02 09:06:00' ORDER BY created_at DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "30669",
+      "region_id": "2",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "71211",
+      "error_preview": "Waiting for selector `div[role=\"button\"]` failed",
+      "created_at": "2026-01-02 09:08:27"
+    },
+    {
+      "id": "30668",
+      "region_id": "1",
+      "status": "success",
+      "products_found": "25",
+      "new_restocks": "25",
+      "duration": "22412",
+      "error_preview": "NULL",
+      "created_at": "2026-01-02 09:07:14"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tregion_id\tstatus\tproducts_found\tnew_restocks\tduration\terror_preview\tcreated_at\n30669\t2\tfailed\t0\t0\t71211\tWaiting for selector `div[role=\"button\"]` failed\t2026-01-02 09:08:27\n30668\t1\tsuccess\t25\t25\t22412\tNULL\t2026-01-02 09:07:14\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}

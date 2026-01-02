@@ -1,0 +1,15 @@
+{
+  "query": "SELECT COUNT(*) as total_products, region_id, COUNT(DISTINCT external_id) as unique_products FROM products GROUP BY region_id ORDER BY total_products DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute SELECT COUNT(*) as total_products, region_id, COUNT(DISTINCT external_id) as unique_products FROM products GROUP BY region_id ORDER BY total_products DESC;",
+  "rows": [
+    {
+      "total_products": "25",
+      "region_id": "1",
+      "unique_products": "25"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_products\tregion_id\tunique_products\n25\t1\t25\n",
+  "stderr": "",
+  "execution_time_ms": 84
+}

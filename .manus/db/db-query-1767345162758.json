@@ -1,0 +1,14 @@
+{
+  "query": "SELECT r.name as region_name, COUNT(p.id) as product_count FROM products p JOIN regions r ON p.region_id = r.id GROUP BY r.id, r.name ORDER BY product_count DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute SELECT r.name as region_name, COUNT(p.id) as product_count FROM products p JOIN regions r ON p.region_id = r.id GROUP BY r.id, r.name ORDER BY product_count DESC;",
+  "rows": [
+    {
+      "region_name": "United States",
+      "product_count": "25"
+    }
+  ],
+  "messages": [],
+  "stdout": "region_name\tproduct_count\nUnited States\t25\n",
+  "stderr": "",
+  "execution_time_ms": 77
+}

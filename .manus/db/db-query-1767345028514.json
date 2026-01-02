@@ -1,0 +1,190 @@
+{
+  "query": "SELECT id, region_id, status, products_found, new_restocks, duration, created_at FROM monitoring_logs ORDER BY created_at DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute SELECT id, region_id, status, products_found, new_restocks, duration, created_at FROM monitoring_logs ORDER BY created_at DESC LIMIT 20;",
+  "rows": [
+    {
+      "id": "30670",
+      "region_id": "3",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "84745",
+      "created_at": "2026-01-02 09:09:54"
+    },
+    {
+      "id": "30669",
+      "region_id": "2",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "71211",
+      "created_at": "2026-01-02 09:08:27"
+    },
+    {
+      "id": "30668",
+      "region_id": "1",
+      "status": "success",
+      "products_found": "25",
+      "new_restocks": "25",
+      "duration": "22412",
+      "created_at": "2026-01-02 09:07:14"
+    },
+    {
+      "id": "30667",
+      "region_id": "4",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "23636",
+      "created_at": "2026-01-02 09:04:49"
+    },
+    {
+      "id": "30666",
+      "region_id": "3",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "51734",
+      "created_at": "2026-01-02 09:04:23"
+    },
+    {
+      "id": "30665",
+      "region_id": "2",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "38672",
+      "created_at": "2026-01-02 09:03:30"
+    },
+    {
+      "id": "30664",
+      "region_id": "1",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "25388",
+      "created_at": "2026-01-02 09:02:49"
+    },
+    {
+      "id": "30663",
+      "region_id": "15",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "1",
+      "created_at": "2026-01-02 08:59:51"
+    },
+    {
+      "id": "30662",
+      "region_id": "14",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "1",
+      "created_at": "2026-01-02 08:59:49"
+    },
+    {
+      "id": "30661",
+      "region_id": "13",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "1",
+      "created_at": "2026-01-02 08:59:47"
+    },
+    {
+      "id": "30660",
+      "region_id": "12",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "1",
+      "created_at": "2026-01-02 08:59:45"
+    },
+    {
+      "id": "30659",
+      "region_id": "11",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "1",
+      "created_at": "2026-01-02 08:59:43"
+    },
+    {
+      "id": "30658",
+      "region_id": "10",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "4",
+      "created_at": "2026-01-02 08:59:41"
+    },
+    {
+      "id": "30657",
+      "region_id": "9",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "1",
+      "created_at": "2026-01-02 08:59:39"
+    },
+    {
+      "id": "30656",
+      "region_id": "8",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "1",
+      "created_at": "2026-01-02 08:59:37"
+    },
+    {
+      "id": "30655",
+      "region_id": "7",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "1",
+      "created_at": "2026-01-02 08:59:35"
+    },
+    {
+      "id": "30654",
+      "region_id": "6",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "0",
+      "created_at": "2026-01-02 08:59:33"
+    },
+    {
+      "id": "30653",
+      "region_id": "5",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "1",
+      "created_at": "2026-01-02 08:59:31"
+    },
+    {
+      "id": "30652",
+      "region_id": "4",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "0",
+      "created_at": "2026-01-02 08:59:29"
+    },
+    {
+      "id": "30651",
+      "region_id": "3",
+      "status": "failed",
+      "products_found": "0",
+      "new_restocks": "0",
+      "duration": "0",
+      "created_at": "2026-01-02 08:59:27"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tregion_id\tstatus\tproducts_found\tnew_restocks\tduration\tcreated_at\n30670\t3\tfailed\t0\t0\t84745\t2026-01-02 09:09:54\n30669\t2\tfailed\t0\t0\t71211\t2026-01-02 09:08:27\n30668\t1\tsuccess\t25\t25\t22412\t2026-01-02 09:07:14\n30667\t4\tfailed\t0\t0\t23636\t2026-01-02 09:04:49\n30666\t3\tfailed\t0\t0\t51734\t2026-01-02 09:04:23\n30665\t2\tfailed\t0\t0\t38672\t2026-01-02 09:03:30\n30664\t1\tfailed\t0\t0\t25388\t2026-01-02 09:02:49\n30663\t15\tfailed\t0\t0\t1\t2026-01-02 08:59:51\n30662\t14\tfailed\t0\t0\t1\t2026-01-02 08:59:49\n30661\t13\tfailed\t0\t0\t1\t2026-01-02 08:59:47\n30660\t12\tfailed\t0\t0\t1\t2026-01-02 08:59:45\n30659\t11\tfailed\t0\t0\t1\t2026-01-02 08:59:43\n30658\t10\tfailed\t0\t0\t4\t2026-01-02 08:59:41\n30657\t9\tfailed\t0\t0\t1\t2026-01-02 08:59:39\n30656\t8\tfailed\t0\t0\t1\t2026-01-02 08:59:37\n30655\t7\tfailed\t0\t0\t1\t2026-01-02 08:59:35\n30654\t6\tfailed\t0\t0\t0\t2026-01-02 08:59:33\n30653\t5\tfailed\t0\t0\t1\t2026-01-02 08:59:31\n30652\t4\tfailed\t0\t0\t0\t2026-01-02 08:59:29\n30651\t3\tfailed\t0\t0\t0\t2026-01-02 08:59:27\n",
+  "stderr": "",
+  "execution_time_ms": 67
+}

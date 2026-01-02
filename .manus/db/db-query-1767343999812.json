@@ -1,0 +1,15 @@
+{
+  "query": "SELECT id, name, url FROM regions WHERE name = 'United States';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute SELECT id, name, url FROM regions WHERE name = 'United States';",
+  "rows": [
+    {
+      "id": "1",
+      "name": "United States",
+      "url": "https://www.hermes.com/us/en/"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\turl\n1\tUnited States\thttps://www.hermes.com/us/en/\n",
+  "stderr": "",
+  "execution_time_ms": 72
+}

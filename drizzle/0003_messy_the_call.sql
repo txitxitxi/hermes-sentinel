@@ -1,0 +1,1 @@
+ALTER TABLE `monitoring_logs` ADD `product_details` text;

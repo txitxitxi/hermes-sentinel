@@ -216,6 +216,7 @@ export const monitoringLogs = mysqlTable("monitoring_logs", {
   newRestocks: int("new_restocks").default(0).notNull(),
   duration: int("duration").notNull(), // milliseconds
   errorMessage: text("error_message"),
+  productDetails: text("product_details"), // JSON array of detected products
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => ({
   regionIdIdx: index("region_id_idx").on(table.regionId),
