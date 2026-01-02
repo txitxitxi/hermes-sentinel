@@ -172,3 +172,9 @@
 - [x] Update AdminPanel to display region name instead of "Region ID: X"
 - [x] Add TypeScript type definitions for logs with regionName
 - [x] Test that region names display correctly
+
+## System Configuration: Reduce Testing Load
+- [x] Query database to find United States region ID (region_id: 1)
+- [x] Verify monitoring configs - already only United States is active
+- [x] Confirm only one region is active for monitoring (user: tianyuxi888@gmail.com)
+- [x] System already optimized - only United States in 30-second scan cycle
