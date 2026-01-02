@@ -31,6 +31,7 @@ import {
   subscriptions,
   monitoringConfigs,
   productFilters,
+  scanLogs,
   type InsertSubscription,
   type InsertMonitoringConfig,
   type InsertProductFilter,
@@ -363,6 +364,29 @@ export const appRouter = router({
 If you received this, your notification system is ready to alert you about Hermès restocks!`,
       });
       return { success, message: success ? 'Test notification sent successfully!' : 'Failed to send test notification' };
+    }),
+
+    // Get scan logs
+    getScanLogs: adminProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database unavailable' });
+
+      const logs = await db.select().from(scanLogs).orderBy(scanLogs.createdAt).limit(100);
+      return logs;
+    }),
+
+    // Manual scan trigger
+    manualScan: adminProcedure.mutation(async () => {
+      const { getMonitoringService } = await import('./monitoring-service');
+      const service = getMonitoringService();
+      
+      try {
+        await service.manualScan();
+        return { success: true, message: 'Manual scan started successfully' };
+      } catch (error) {
+        console.error('[Admin] Manual scan error:', error);
+        return { success: false, message: error instanceof Error ? error.message : 'Failed to start manual scan' };
+      }
     }),
   }),
 });

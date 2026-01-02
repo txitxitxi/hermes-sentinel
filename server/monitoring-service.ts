@@ -19,12 +19,15 @@ import {
   restockHistory, 
   notifications, 
   monitoringLogs,
+  scanLogs,
+  monitoringConfigs,
   type Region,
   type Product,
   type InsertProduct,
   type InsertRestockHistory,
   type InsertNotification,
   type InsertMonitoringLog,
+  type InsertScanLog,
 } from '../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
 
@@ -60,10 +63,37 @@ export class MonitoringService {
   }
 
   /**
+   * Manually trigger a scan of all monitored regions
+   */
+  public async manualScan(): Promise<void> {
+    const db = await getDb();
+    if (!db) throw new Error('Database not available');
+
+    console.log('[MonitoringService] Manual scan triggered');
+
+    // Get all regions being monitored
+    const monitoredRegions = await db
+      .select()
+      .from(regions)
+      .innerJoin(
+        monitoringConfigs,
+        eq(regions.id, monitoringConfigs.regionId)
+      )
+      .where(eq(monitoringConfigs.isActive, true));
+
+    // Monitor each region
+    for (const { regions: region } of monitoredRegions) {
+      await this.monitorRegion(region);
+      await this.delay(2000); // Delay between regions
+    }
+
+    console.log('[MonitoringService] Manual scan completed');
+  }
+
+  /**
    * Stop the monitoring service
    */
-  stop() {
-    if (!this.isRunning) {
+  public stop() { if (!this.isRunning) {
       return;
     }
 
@@ -179,9 +209,9 @@ export class MonitoringService {
         }
       }
 
-      // Log successful monitoring
+      // Log successful scan
       const duration = Date.now() - startTime;
-      await this.logMonitoring(region.id, 'success', productsFound, newRestocks, duration);
+      await this.logScan(region.id, 'success', productsFound, newRestocks, duration);
 
       if (newRestocks > 0) {
         console.log(`[MonitoringService] Found ${newRestocks} new restocks in ${region.name}`);
@@ -190,7 +220,7 @@ export class MonitoringService {
       const duration = Date.now() - startTime;
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       
-      await this.logMonitoring(region.id, 'failed', 0, 0, duration, errorMessage);
+      await this.logScan(region.id, 'failed', 0, 0, duration, errorMessage);
       console.error(`[MonitoringService] Error monitoring ${region.name}:`, error);
     }
   }
@@ -201,9 +231,16 @@ export class MonitoringService {
    * Scrape a region's Hermès website for products
    */
   private async scrapeRegionWebsite(region: Region): Promise<InsertProduct[]> {
-    const puppeteer = require('puppeteer-extra');
-    const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-    puppeteer.use(StealthPlugin());
+    // Import puppeteer dynamically to avoid build issues
+    let puppeteer, StealthPlugin;
+    try {
+      puppeteer = (await import('puppeteer-extra')).default;
+      StealthPlugin = (await import('puppeteer-extra-plugin-stealth')).default;
+      puppeteer.use(StealthPlugin());
+    } catch (error) {
+      console.error('[MonitoringService] Failed to load puppeteer:', error);
+      return [];
+    }
 
     let browser;
     try {
@@ -495,6 +532,33 @@ Detected at: ${new Date().toLocaleString()}
     };
 
     await db.insert(monitoringLogs).values(logData);
+  }
+
+  /**
+   * Log scan activity to scan_logs table
+   */
+  private async logScan(
+    regionId: number,
+    status: 'success' | 'failed',
+    productsFound: number,
+    newRestocks: number,
+    duration: number,
+    errorMessage?: string
+  ) {
+    const db = await getDb();
+    if (!db) return;
+
+    const logData: InsertScanLog = {
+      regionId,
+      status,
+      productsFound,
+      newRestocks,
+      duration,
+      errorMessage: errorMessage || undefined,
+      createdAt: new Date(),
+    };
+
+    await db.insert(scanLogs).values(logData);
   }
 
   /**

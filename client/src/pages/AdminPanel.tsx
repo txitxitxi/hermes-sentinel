@@ -15,6 +15,9 @@ export default function AdminPanel() {
   const { data: stats, isLoading: statsLoading } = trpc.admin.getStats.useQuery();
   const { data: users, isLoading: usersLoading } = trpc.admin.getUsers.useQuery({ limit: 50 });
   const { data: monitoringLogs, isLoading: logsLoading } = trpc.admin.getMonitoringLogs.useQuery({ limit: 50 });
+  const { data: scanLogs, isLoading: scanLogsLoading, refetch: refetchScanLogs } = trpc.admin.getScanLogs.useQuery(undefined, {
+    refetchInterval: 10000, // Refresh every 10 seconds
+  });
   const { data: monitoringStatus, isLoading: statusLoading, refetch: refetchStatus } = trpc.admin.getMonitoringStatus.useQuery(undefined, {
     refetchInterval: 5000, // Refresh every 5 seconds
   });
@@ -32,6 +35,13 @@ export default function AdminPanel() {
   });
 
   const sendTestNotification = trpc.admin.sendTestNotification.useMutation();
+
+  const manualScan = trpc.admin.manualScan.useMutation({
+    onSuccess: () => {
+      refetchScanLogs();
+      refetchStatus();
+    },
+  });
 
   // Redirect if not admin
   if (user && user.role !== 'admin') {
@@ -110,6 +120,15 @@ export default function AdminPanel() {
                 >
                   <RefreshCw className="h-4 w-4" />
                 </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={!monitoringStatus?.isRunning || manualScan.isPending}
+                  onClick={() => manualScan.mutate()}
+                >
+                  <RefreshCw className="h-4 w-4 mr-1" />
+                  Manual Scan
+                </Button>
               </div>
             </div>
 
@@ -128,8 +147,27 @@ export default function AdminPanel() {
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
                 The monitoring service runs every 30 seconds. You will receive Manus notifications when restocks are detected.
+                <br />
+                <span className="text-xs">Click "Manual Scan" to trigger an immediate scan of all monitored regions.</span>
               </AlertDescription>
             </Alert>
+
+            {manualScan.isSuccess && (
+              <Alert className="bg-green-50 border-green-200">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <AlertDescription className="text-green-800">
+                  ✅ {manualScan.data.message}
+                </AlertDescription>
+              </Alert>
+            )}
+            {manualScan.isError && (
+              <Alert className="bg-red-50 border-red-200">
+                <XCircle className="h-4 w-4 text-red-600" />
+                <AlertDescription className="text-red-800">
+                  ❌ Failed to start manual scan
+                </AlertDescription>
+              </Alert>
+            )}
 
             <div className="pt-2">
               <Button
@@ -238,6 +276,73 @@ export default function AdminPanel() {
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">No users found.</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Scan Logs - Detailed Activity */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Scan Activity Logs</CardTitle>
+                <CardDescription>
+                  Detailed records of each monitoring scan execution
+                </CardDescription>
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => refetchScanLogs()}
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {scanLogsLoading ? (
+              <p className="text-sm text-muted-foreground">Loading scan logs...</p>
+            ) : scanLogs && scanLogs.length > 0 ? (
+              <div className="space-y-3">
+                {scanLogs.slice(0, 20).map((log) => (
+                  <div 
+                    key={log.id} 
+                    className="flex items-start gap-3 border-b border-border pb-3 last:border-0"
+                  >
+                    <div className="mt-1">
+                      {log.status === 'success' && (
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                      )}
+                      {log.status === 'failed' && (
+                        <XCircle className="h-4 w-4 text-red-500" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <p className="font-medium">Region ID: {log.regionId}</p>
+                        <Badge 
+                          variant={log.status === 'success' ? 'default' : 'destructive'}
+                        >
+                          {log.status}
+                        </Badge>
+                      </div>
+                      <div className="text-sm text-muted-foreground mt-1 space-y-1">
+                        <div className="flex items-center gap-4">
+                          <span>🔍 Products Found: <strong>{log.productsFound}</strong></span>
+                          <span>🆕 New Restocks: <strong className="text-green-600">{log.newRestocks}</strong></span>
+                          <span>⏱️ Duration: {log.duration}ms</span>
+                        </div>
+                        <p className="text-xs">{new Date(log.createdAt).toLocaleString()}</p>
+                        {log.errorMessage && (
+                          <p className="text-red-500 text-xs mt-1">❌ Error: {log.errorMessage}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No scan logs available. Start monitoring to see activity.</p>
             )}
           </CardContent>
         </Card>

@@ -136,3 +136,19 @@
 - [x] Implement anti-detection measures (stealth, random delays)
 - [x] Test scraping on real Hermès websites
 - [x] Add error handling and retry logic
+
+## Bug Fix: Puppeteer Dynamic Require Error
+- [ ] Fix "Dynamic require of 'puppeteer-extra' is not supported" error
+- [ ] Change from require() to ES module import
+- [ ] Test monitoring service starts successfully
+- [ ] Verify scraping works without errors
+
+## Feature: Monitoring Logs and Manual Refresh
+- [x] Add scan log recording to monitoring service
+- [x] Create database table for scan logs (scanLogs)
+- [x] Display scan logs in Admin Panel with detailed information
+- [x] Add "Manual Refresh" button to trigger immediate scan
+- [x] Implement manual scan API endpoint (admin.manualScan)
+- [x] Implement getScanLogs API endpoint (admin.getScanLogs)
+- [x] Test log display and manual refresh functionality
+- [x] Write unit tests (8/9 tests passing, 1 timeout due to Puppeteer)

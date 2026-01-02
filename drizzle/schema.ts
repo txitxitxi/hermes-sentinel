@@ -207,6 +207,23 @@ export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = typeof notifications.$inferInsert;
 
 /**
+ * Scan logs table - records each monitoring scan execution
+ */
+export const scanLogs = mysqlTable("scan_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  regionId: int("region_id").notNull(),
+  status: mysqlEnum("status", ["success", "failed"]).notNull(),
+  productsFound: int("products_found").default(0),
+  newRestocks: int("new_restocks").default(0),
+  duration: int("duration").notNull(), // in milliseconds
+  errorMessage: text("error_message"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type ScanLog = typeof scanLogs.$inferSelect;
+export type InsertScanLog = typeof scanLogs.$inferInsert;
+
+/**
  * System monitoring logs
  */
 export const monitoringLogs = mysqlTable("monitoring_logs", {
