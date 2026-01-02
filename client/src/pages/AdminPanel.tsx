@@ -8,16 +8,42 @@ import { Users, Activity, TrendingUp, AlertCircle, CheckCircle, XCircle, Play, S
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useLocation } from "wouter";
 
+type ScanLog = {
+  id: number;
+  regionId: number;
+  regionName: string | null;
+  status: 'success' | 'failed' | 'blocked';
+  productsFound: number;
+  newRestocks: number;
+  duration: number;
+  errorMessage: string | null;
+  createdAt: Date;
+};
+
+type MonitoringLog = {
+  id: number;
+  regionId: number;
+  regionName: string | null;
+  status: 'success' | 'failed' | 'blocked';
+  productsFound: number;
+  newRestocks: number;
+  duration: number;
+  errorMessage: string | null;
+  createdAt: Date;
+};
+
 export default function AdminPanel() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   
   const { data: stats, isLoading: statsLoading } = trpc.admin.getStats.useQuery();
   const { data: users, isLoading: usersLoading } = trpc.admin.getUsers.useQuery({ limit: 50 });
-  const { data: monitoringLogs, isLoading: logsLoading } = trpc.admin.getMonitoringLogs.useQuery({ limit: 50 });
-  const { data: scanLogs, isLoading: scanLogsLoading, refetch: refetchScanLogs } = trpc.admin.getScanLogs.useQuery(undefined, {
+  const { data: monitoringLogsData, isLoading: logsLoading } = trpc.admin.getMonitoringLogs.useQuery({ limit: 50 });
+  const monitoringLogs = monitoringLogsData as MonitoringLog[] | undefined;
+  const { data: scanLogsData, isLoading: scanLogsLoading, refetch: refetchScanLogs } = trpc.admin.getScanLogs.useQuery(undefined, {
     refetchInterval: 10000, // Refresh every 10 seconds
   });
+  const scanLogs = scanLogsData as ScanLog[] | undefined;
   const { data: monitoringStatus, isLoading: statusLoading, refetch: refetchStatus } = trpc.admin.getMonitoringStatus.useQuery(undefined, {
     refetchInterval: 5000, // Refresh every 5 seconds
   });
@@ -319,7 +345,7 @@ export default function AdminPanel() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <p className="font-medium">Region ID: {log.regionId}</p>
+                        <p className="font-medium">{log.regionName || `Region ID: ${log.regionId}`}</p>
                         <Badge 
                           variant={log.status === 'success' ? 'default' : 'destructive'}
                         >
@@ -378,7 +404,7 @@ export default function AdminPanel() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <p className="font-medium">Region ID: {log.regionId}</p>
+                        <p className="font-medium">{log.regionName || `Region ID: ${log.regionId}`}</p>
                         <Badge 
                           variant={
                             log.status === 'success' ? 'default' : 

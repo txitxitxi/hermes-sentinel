@@ -164,3 +164,11 @@
 - [x] Redirect subscribed users to /dashboard automatically
 - [x] Keep landing page visible for non-subscribed users
 - [x] Test redirect logic works correctly
+
+## Bug Fix: Display Region Names in Scan Logs
+- [x] Update getScanLogs API to join regions table
+- [x] Update getRecentMonitoringLogs API to join regions table
+- [x] Return region name along with region ID
+- [x] Update AdminPanel to display region name instead of "Region ID: X"
+- [x] Add TypeScript type definitions for logs with regionName
+- [x] Test that region names display correctly

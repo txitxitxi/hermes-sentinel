@@ -32,6 +32,7 @@ import {
   monitoringConfigs,
   productFilters,
   scanLogs,
+  regions,
   type InsertSubscription,
   type InsertMonitoringConfig,
   type InsertProductFilter,
@@ -371,7 +372,22 @@ If you received this, your notification system is ready to alert you about Herm√
       const db = await getDb();
       if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database unavailable' });
 
-      const logs = await db.select().from(scanLogs).orderBy(scanLogs.createdAt).limit(100);
+      const logs = await db
+        .select({
+          id: scanLogs.id,
+          regionId: scanLogs.regionId,
+          regionName: regions.name,
+          status: scanLogs.status,
+          productsFound: scanLogs.productsFound,
+          newRestocks: scanLogs.newRestocks,
+          duration: scanLogs.duration,
+          errorMessage: scanLogs.errorMessage,
+          createdAt: scanLogs.createdAt,
+        })
+        .from(scanLogs)
+        .leftJoin(regions, eq(scanLogs.regionId, regions.id))
+        .orderBy(scanLogs.createdAt)
+        .limit(100);
       return logs;
     }),
 
