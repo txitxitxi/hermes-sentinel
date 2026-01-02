@@ -153,3 +153,10 @@
 - [x] Remove redundant "Scan Activity Logs" section from Admin Panel
 - [x] Move "Clear History" button from Scan Activity Logs to Monitoring System Logs section
 - [x] Verify only US region is scanned after fixes (confirmed: only 1 scan log for US, 25 products detected)
+
+
+## Bug: Puppeteer Cache Path Still Failing
+- [x] Investigate why PUPPETEER_CACHE_DIR environment variable is not being applied (env var doesn't work, need explicit path)
+- [x] Find correct Chromium executable path in /home/ubuntu/.cache/puppeteer (found: /home/ubuntu/.cache/puppeteer/chrome/linux-143.0.7499.169/chrome-linux64/chrome)
+- [x] Set executablePath directly in puppeteer.launch() configuration
+- [x] Test manual scan to verify Chromium launches successfully (verified: 24 products detected, no errors)

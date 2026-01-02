@@ -1,0 +1,18 @@
+{
+  "query": "SELECT ml.id, r.name as region_name, ml.status, ml.products_found, ml.error_message, ml.created_at FROM monitoring_logs ml JOIN regions r ON ml.region_id = r.id WHERE ml.created_at > '2026-01-02 09:43:00' ORDER BY ml.created_at DESC LIMIT 2;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute SELECT ml.id, r.name as region_name, ml.status, ml.products_found, ml.error_message, ml.created_at FROM monitoring_logs ml JOIN regions r ON ml.region_id = r.id WHERE ml.created_at > '2026-01-02 09:43:00' ORDER BY ml.created_at DESC LIMIT 2;",
+  "rows": [
+    {
+      "id": "30689",
+      "region_name": "United States",
+      "status": "success",
+      "products_found": "24",
+      "error_message": "NULL",
+      "created_at": "2026-01-02 09:43:30"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tregion_name\tstatus\tproducts_found\terror_message\tcreated_at\n30689\tUnited States\tsuccess\t24\tNULL\t2026-01-02 09:43:30\n",
+  "stderr": "",
+  "execution_time_ms": 120
+}
