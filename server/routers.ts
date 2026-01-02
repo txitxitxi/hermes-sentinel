@@ -290,6 +290,7 @@ export const appRouter = router({
       .input(z.object({ limit: z.number().default(100) }))
       .query(async ({ input }) => {
         const db = await getDb();
+        if (!db) throw new Error('Database not available');
         const logs = await db
           .select({
             id: monitoringLogs.id,
@@ -317,6 +318,7 @@ export const appRouter = router({
       const isRunning = monitoringService.isRunning();
       const uptime = monitoringService.getUptime();
       const db = await getDb();
+      if (!db) throw new Error('Database not available');
       
       const [activeConfigs, totalRestocks] = await Promise.all([
         db.select().from(monitoringConfigs).where(eq(monitoringConfigs.isActive, true)),
@@ -361,6 +363,7 @@ export const appRouter = router({
     // Clear scan logs
     clearScanLogs: adminProcedure.mutation(async () => {
       const db = await getDb();
+      if (!db) throw new Error('Database not available');
       await db.delete(monitoringLogs);
       return { success: true, message: 'Scan logs cleared successfully' };
     }),

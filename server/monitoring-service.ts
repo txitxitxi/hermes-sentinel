@@ -616,6 +616,9 @@ if (typeof process !== 'undefined') {
 // For tsx watch hot module reload: stop old instance before creating new one
 if (monitoringServiceInstance) {
   console.log('[MonitoringService] Hot reload detected, stopping old instance...');
-  monitoringServiceInstance.stop();
+  const instance = monitoringServiceInstance as any;
+  if (instance && typeof instance.stop === 'function') {
+    instance.stop();
+  }
   monitoringServiceInstance = null;
 }

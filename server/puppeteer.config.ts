@@ -7,9 +7,29 @@
 
 import { homedir } from 'os';
 import { join } from 'path';
+import { existsSync } from 'fs';
 
-// Chromium executable path
-export const CHROMIUM_EXECUTABLE_PATH = '/home/ubuntu/.cache/puppeteer/chrome/linux-143.0.7499.169/chrome-linux64/chrome';
+// Possible Chromium paths (try in order)
+const CHROMIUM_PATHS = [
+  '/usr/bin/chromium-browser',     // Ubuntu/Debian system Chromium
+  '/usr/bin/chromium',              // Alternative system Chromium
+  '/usr/bin/google-chrome',         // Google Chrome
+  '/usr/bin/google-chrome-stable',  // Google Chrome stable
+  '/home/ubuntu/.cache/puppeteer/chrome/linux-143.0.7499.169/chrome-linux64/chrome', // Bundled Chromium (dev sandbox)
+];
+
+// Find first available Chromium executable
+function findChromiumPath(): string {
+  for (const path of CHROMIUM_PATHS) {
+    if (existsSync(path)) {
+      return path;
+    }
+  }
+  // If none found, return the first path as fallback (will fail with clear error)
+  return CHROMIUM_PATHS[0];
+}
+
+export const CHROMIUM_EXECUTABLE_PATH = findChromiumPath();
 
 // Puppeteer cache directory
 export const PUPPETEER_CACHE_DIR = join(homedir(), '.cache', 'puppeteer');
@@ -32,5 +52,9 @@ export const DEFAULT_LAUNCH_OPTIONS = {
   ]
 };
 
-console.log('[Puppeteer Config] Chromium path:', CHROMIUM_EXECUTABLE_PATH);
+console.log('[Puppeteer Config] Checking Chromium paths:');
+CHROMIUM_PATHS.forEach(path => {
+  console.log(`  ${existsSync(path) ? '✓' : '✗'} ${path}`);
+});
+console.log('[Puppeteer Config] Using Chromium path:', CHROMIUM_EXECUTABLE_PATH);
 console.log('[Puppeteer Config] Cache directory:', PUPPETEER_CACHE_DIR);
