@@ -4,10 +4,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Bell, Globe, Filter, TrendingUp, Shield, Zap } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
+import { trpc } from "@/lib/trpc";
+import { useEffect } from "react";
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
+  const { data: subscription } = trpc.subscription.getCurrent.useQuery(undefined, {
+    enabled: isAuthenticated,
+  });
+
+  // Auto-redirect subscribed users to dashboard
+  useEffect(() => {
+    if (isAuthenticated && subscription) {
+      setLocation("/dashboard");
+    }
+  }, [isAuthenticated, subscription, setLocation]);
 
   const handleGetStarted = () => {
     if (isAuthenticated) {
@@ -16,6 +28,18 @@ export default function Home() {
       window.location.href = getLoginUrl();
     }
   };
+
+  // Show loading state while checking subscription
+  if (isAuthenticated && subscription === undefined) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

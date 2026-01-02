@@ -158,3 +158,9 @@
 - [x] Allow Manual Scan to work independently of monitoring service status
 - [x] Test Manual Scan works when service is stopped
 - [x] Verify Manual Scan still works when service is running
+
+## Feature: Auto-redirect Subscribed Users to Dashboard
+- [x] Check user subscription status on home page load
+- [x] Redirect subscribed users to /dashboard automatically
+- [x] Keep landing page visible for non-subscribed users
+- [x] Test redirect logic works correctly
