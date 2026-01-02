@@ -14,7 +14,7 @@ export default function AdminPanel() {
   
   const { data: stats, isLoading: statsLoading } = trpc.admin.getStats.useQuery();
   const { data: users, isLoading: usersLoading } = trpc.admin.getUsers.useQuery({ limit: 50 });
-  const { data: monitoringLogs, isLoading: logsLoading } = trpc.admin.getMonitoringLogs.useQuery({ limit: 50 });
+  const { data: monitoringLogs, isLoading: logsLoading, refetch: refetchMonitoringLogs } = trpc.admin.getMonitoringLogs.useQuery({ limit: 50 });
   const { data: scanLogs, isLoading: scanLogsLoading, refetch: refetchScanLogs } = (trpc.admin as any).getScanLogs.useQuery(undefined, {
     refetchInterval: 10000, // Refresh every 10 seconds
   });
@@ -45,6 +45,7 @@ export default function AdminPanel() {
 
   const clearScanLogs = (trpc.admin as any).clearScanLogs.useMutation({
     onSuccess: () => {
+      refetchMonitoringLogs();
       refetchScanLogs();
     },
   });

@@ -11,6 +11,9 @@
  * - Notification queue management
  */
 
+// Set Puppeteer executable path before importing
+process.env.PUPPETEER_EXECUTABLE_PATH = '/home/ubuntu/.cache/puppeteer/chrome/linux-143.0.7499.169/chrome-linux64/chrome';
+
 import { getDb, getUserActiveProductFilters } from './db';
 import { notifyOwner } from './_core/notification';
 import { 
@@ -219,7 +222,6 @@ export class MonitoringService {
   private async scrapeRegionWebsite(region: Region): Promise<InsertProduct[]> {
     const browser = await puppeteer.launch({
       headless: true,
-      executablePath: '/home/ubuntu/.cache/puppeteer/chrome/linux-143.0.7499.169/chrome-linux64/chrome',
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',

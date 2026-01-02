@@ -160,3 +160,11 @@
 - [x] Find correct Chromium executable path in /home/ubuntu/.cache/puppeteer (found: /home/ubuntu/.cache/puppeteer/chrome/linux-143.0.7499.169/chrome-linux64/chrome)
 - [x] Set executablePath directly in puppeteer.launch() configuration
 - [x] Test manual scan to verify Chromium launches successfully (verified: 24 products detected, no errors)
+
+
+## Bug: Chromium Executable Not Found & Clear History Not Working
+- [x] Check Chromium file permissions and verify executable path (file exists with -rwxr-xr-x permissions)
+- [x] Fix executablePath by setting PUPPETEER_EXECUTABLE_PATH env var before importing puppeteer
+- [x] Fix clearScanLogs mutation to refetch correct query (changed from refetchScanLogs to refetch)
+- [x] Test Clear History button deletes all logs successfully (verified with SQL query, UI updates after server restart)
+- [x] Test manual scan works with corrected Chromium path (verified: 24 products detected, scan completed successfully)
