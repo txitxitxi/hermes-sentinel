@@ -184,3 +184,14 @@
 ## Remaining Issues
 - [ ] Fix Clear History button Safari compatibility (window.confirm not working, needs alternative UI approach)
 - [ ] Update Dashboard Recent Restock Activity to show product names (needs same fix as History page)
+
+
+## Fix: Remove Clear History Confirmation & Fix Dashboard Product Names
+- [x] Remove window.confirm() from Clear History button (direct delete without popup)
+- [x] Update Dashboard getRecentRestockHistory query to join products table (already done in previous fix)
+- [x] Update Dashboard.tsx to display product names instead of "Product #24" (now shows productName || fallback to Product #ID)
+- [ ] Test Clear History button deletes logs without confirmation (frontend tRPC caching issue - backend DELETE works, UI doesn't update)
+- [x] Test Dashboard shows actual product names (verified: "So Medor bag", "Neo Double Sens 35 unicolor bag", "Poche Cliquetis bag")
+
+## Known Issues
+- Clear History button: tRPC query caching prevents UI from updating after deletion (backend works correctly, frontend refetch not working)

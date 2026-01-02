@@ -153,7 +153,7 @@ export default function Dashboard() {
                 {recentRestocks.slice(0, 5).map((restock) => (
                   <div key={restock.id} className="flex items-center justify-between border-b border-border pb-3 last:border-0">
                     <div>
-                      <p className="font-medium">Product #{restock.productId}</p>
+                      <p className="font-medium">{restock.productName || `Product #${restock.productId}`}</p>
                       <p className="text-sm text-muted-foreground">
                         Detected {new Date(restock.detectedAt).toLocaleString()}
                       </p>
