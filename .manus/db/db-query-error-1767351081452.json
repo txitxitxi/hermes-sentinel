@@ -1,0 +1,8 @@
+{
+  "query": "SELECT ml.id, ml.status, ml.products_found, ml.new_restocks, ml.duration_ms, ml.created_at, r.name as region_name FROM monitoring_logs ml LEFT JOIN regions r ON ml.region_id = r.id ORDER BY ml.created_at DESC LIMIT 3",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute SELECT ml.id, ml.status, ml.products_found, ml.new_restocks, ml.duration_ms, ml.created_at, r.name as region_name FROM monitoring_logs ml LEFT JOIN regions r ON ml.region_id = r.id ORDER BY ml.created_at DESC LIMIT 3",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'ml.duration_ms' in 'field list'"
+  ]
+}

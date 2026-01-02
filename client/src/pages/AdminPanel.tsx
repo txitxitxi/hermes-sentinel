@@ -43,10 +43,12 @@ export default function AdminPanel() {
     },
   });
 
+  const utils = trpc.useUtils();
+  
   const clearScanLogs = (trpc.admin as any).clearScanLogs.useMutation({
     onSuccess: () => {
-      refetchMonitoringLogs();
-      refetchScanLogs();
+      // Force invalidate all admin queries to clear cache
+      utils.admin.invalidate();
     },
   });
 

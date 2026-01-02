@@ -1,0 +1,37 @@
+{
+  "query": "SELECT ml.id, ml.status, ml.products_found, ml.new_restocks, ml.duration, ml.created_at, r.name as region_name FROM monitoring_logs ml LEFT JOIN regions r ON ml.region_id = r.id ORDER BY ml.created_at DESC LIMIT 3",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2LSjgciXE5U7gJN.root --database AE5tzfuADY2nWPRKhfHJC3 --execute SELECT ml.id, ml.status, ml.products_found, ml.new_restocks, ml.duration, ml.created_at, r.name as region_name FROM monitoring_logs ml LEFT JOIN regions r ON ml.region_id = r.id ORDER BY ml.created_at DESC LIMIT 3",
+  "rows": [
+    {
+      "id": "30745",
+      "status": "success",
+      "products_found": "24",
+      "new_restocks": "0",
+      "duration": "11546",
+      "created_at": "2026-01-02 10:51:26",
+      "region_name": "United States"
+    },
+    {
+      "id": "30744",
+      "status": "success",
+      "products_found": "24",
+      "new_restocks": "0",
+      "duration": "12346",
+      "created_at": "2026-01-02 10:50:57",
+      "region_name": "United States"
+    },
+    {
+      "id": "30743",
+      "status": "success",
+      "products_found": "24",
+      "new_restocks": "0",
+      "duration": "16220",
+      "created_at": "2026-01-02 10:50:31",
+      "region_name": "United States"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstatus\tproducts_found\tnew_restocks\tduration\tcreated_at\tregion_name\n30745\tsuccess\t24\t0\t11546\t2026-01-02 10:51:26\tUnited States\n30744\tsuccess\t24\t0\t12346\t2026-01-02 10:50:57\tUnited States\n30743\tsuccess\t24\t0\t16220\t2026-01-02 10:50:31\tUnited States\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

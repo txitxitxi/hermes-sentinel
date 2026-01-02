@@ -11,9 +11,8 @@
  * - Notification queue management
  */
 
-// Set Puppeteer executable path before importing
-process.env.PUPPETEER_EXECUTABLE_PATH = '/home/ubuntu/.cache/puppeteer/chrome/linux-143.0.7499.169/chrome-linux64/chrome';
-
+// Import Puppeteer config FIRST to set environment variables
+import { DEFAULT_LAUNCH_OPTIONS } from './puppeteer.config';
 import { getDb, getUserActiveProductFilters } from './db';
 import { notifyOwner } from './_core/notification';
 import { 
@@ -32,11 +31,6 @@ import {
 } from '../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
 import puppeteer from 'puppeteer';
-import { homedir } from 'os';
-import { join } from 'path';
-
-// Set Puppeteer cache directory to avoid /root/.cache issues
-process.env.PUPPETEER_CACHE_DIR = join(homedir(), '.cache', 'puppeteer');
 
 /**
  * MonitoringService handles the core monitoring logic
@@ -220,17 +214,8 @@ export class MonitoringService {
    * Uses Puppeteer with stealth plugin for anti-detection
    */
   private async scrapeRegionWebsite(region: Region): Promise<InsertProduct[]> {
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--disable-gpu',
-        '--window-size=1920x1080'
-      ]
-    });
+    console.log('[Scraper] Launching browser with config:', DEFAULT_LAUNCH_OPTIONS.executablePath);
+    const browser = await puppeteer.launch(DEFAULT_LAUNCH_OPTIONS);
 
     try {
       const page = await browser.newPage();
@@ -604,4 +589,31 @@ export function stopMonitoringService() {
   if (monitoringServiceInstance) {
     monitoringServiceInstance.stop();
   }
+}
+
+// Clean up monitoring service on process exit or hot module reload
+if (typeof process !== 'undefined') {
+  process.on('beforeExit', () => {
+    console.log('[MonitoringService] Process exiting, stopping monitoring service...');
+    stopMonitoringService();
+  });
+  
+  process.on('SIGTERM', () => {
+    console.log('[MonitoringService] SIGTERM received, stopping monitoring service...');
+    stopMonitoringService();
+    process.exit(0);
+  });
+  
+  process.on('SIGINT', () => {
+    console.log('[MonitoringService] SIGINT received, stopping monitoring service...');
+    stopMonitoringService();
+    process.exit(0);
+  });
+}
+
+// For tsx watch hot module reload: stop old instance before creating new one
+if (monitoringServiceInstance) {
+  console.log('[MonitoringService] Hot reload detected, stopping old instance...');
+  monitoringServiceInstance.stop();
+  monitoringServiceInstance = null;
 }

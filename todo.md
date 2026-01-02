@@ -195,3 +195,67 @@
 
 ## Known Issues
 - Clear History button: tRPC query caching prevents UI from updating after deletion (backend works correctly, frontend refetch not working)
+
+
+## Critical Bug: Chromium Path Error Returned & Monitoring Won't Start
+- [x] Investigate why PUPPETEER_EXECUTABLE_PATH environment variable was lost after restart
+- [x] Verify monitoring-service.ts still has the environment variable set at top of file
+- [x] Fix Chromium path permanently so it persists across restarts
+- [x] Test Start monitoring button works after fix
+
+## Bug: Clear History Button Caching Issue
+- [ ] Replace refetchMonitoringLogs() with queryClient.invalidateQueries()
+- [ ] Test Clear History button properly updates UI after deletion
+
+
+## Session 2026-01-02: Chromium Path Fix (Persistent Solution)
+- [x] Created centralized Puppeteer configuration file (server/puppeteer.config.ts)
+- [x] Updated monitoring-service.ts to import and use DEFAULT_LAUNCH_OPTIONS
+- [x] Verified Manual Scan works successfully with new config (detected 24 products)
+- [x] Identified root cause: Old monitoring service process still running with old code
+- [x] Stop old monitoring service instance (added process exit handlers)
+- [x] Verify automatic monitoring works with new configuration after clean restart
+- [x] Test Start Monitoring button to ensure 30-second interval scanning works
+- [x] Create checkpoint once all issues resolved
+
+### Technical Details
+- Created `server/puppeteer.config.ts` with CHROMIUM_EXECUTABLE_PATH constant
+- Exports DEFAULT_LAUNCH_OPTIONS with all Puppeteer settings
+- Sets environment variables immediately on module import
+- Monitoring service imports config FIRST before other dependencies
+- Manual scan confirmed working: "✅ Manual scan completed successfully" + 24 products detected
+- Issue: Old server process still running setInterval() with old code (fails every 30s)
+
+
+### Final Solution Summary
+**Problem**: Chromium executable path error caused monitoring service to fail after server restarts.
+
+**Root Causes Identified**:
+1. Environment variable `PUPPETEER_EXECUTABLE_PATH` set at runtime wasn't persisting across tsx watch hot reloads
+2. Old monitoring service instances with setInterval() continued running after code changes
+3. Singleton pattern kept old instances in memory during hot module reload
+
+**Solution Implemented**:
+1. **Centralized Configuration** (`server/puppeteer.config.ts`):
+   - Hardcoded CHROMIUM_EXECUTABLE_PATH constant
+   - Exported DEFAULT_LAUNCH_OPTIONS with all Puppeteer settings
+   - Set environment variables immediately on module import
+   
+2. **Proper Cleanup** (added to `monitoring-service.ts`):
+   - Process exit handlers (beforeExit, SIGTERM, SIGINT) to stop monitoring service
+   - Hot module reload detection to stop old instances before creating new ones
+   - Ensures setInterval() is cleared when server restarts
+
+3. **Import Order** (in `monitoring-service.ts`):
+   - Import puppeteer.config.ts FIRST before other dependencies
+   - Ensures Chromium path is set before Puppeteer is loaded
+
+**Verification**:
+- ✅ Manual Scan: Successfully detected 24 products
+- ✅ Automatic Monitoring: 5 consecutive successful scans every ~30 seconds
+- ✅ Persistence: Configuration survives tsx watch restarts
+- ✅ Cleanup: Old monitoring instances properly stopped
+
+**Files Modified**:
+- `server/puppeteer.config.ts` (new file)
+- `server/monitoring-service.ts` (import config, add cleanup handlers)
