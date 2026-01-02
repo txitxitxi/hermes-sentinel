@@ -302,6 +302,7 @@ export async function getRecentMonitoringLogs(limit = 100): Promise<any[]> {
       regionId: monitoringLogs.regionId,
       regionName: regions.name,
       status: monitoringLogs.status,
+      scanType: monitoringLogs.scanType,
       productsFound: monitoringLogs.productsFound,
       newRestocks: monitoringLogs.newRestocks,
       duration: monitoringLogs.duration,

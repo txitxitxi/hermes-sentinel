@@ -286,3 +286,19 @@
 - [x] Show "Auto Scan Disabled" when monitoring is stopped
 - [x] Update Service Status section in Admin Panel
 - [x] Test status changes when Start/Stop buttons are clicked - **WORKING**
+
+
+## Session 2026-01-02 Part 3: Fix Service Status and Manual Scan Label
+
+### Bug 1: Service Status Shows Scan Execution State Instead of Monitoring Service State
+- [x] Change "Service Status" badges to reflect monitoring service state (isRunning)
+- [x] Show "🟢 Running" when auto-scan is enabled (even during 30s wait between scans)
+- [x] Show "⭕ Stopped" only when monitoring service is stopped
+- [x] Remove scan execution state from Service Status section
+- [x] Test: Start monitoring → should show "🟢 Running" immediately and stay running during wait - **WORKING**
+
+### Bug 2: Manual Scan Logs Showing "Auto" Instead of "Manual"
+- [x] Debug why scanType='manual' parameter is not being saved to database - **FIXED** (backend was saving correctly)
+- [x] Check if Drizzle ORM is correctly handling the enum value - **WORKING**
+- [x] Verify logMonitoring is receiving 'manual' parameter - **WORKING**
+- [x] Test manual scan shows "🖱️ Manual" label in logs - **WORKING** (issue was missing scanType in getRecentMonitoringLogs query)
