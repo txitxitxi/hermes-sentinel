@@ -109,3 +109,9 @@
 - [x] Enable Manual Scan button (removed isRunning dependency)
 - [x] Fix scan history showing region IDs instead of region names (updated both getScanLogs and getRecentMonitoringLogs to join regions table)
 - [x] Add "Clear History" button to scan logs section (with confirmation dialog)
+
+## Bug Fix: Manual Scan Failure
+- [x] Identified missing runManualScan() method in MonitoringService class
+- [x] Added runManualScan(), isRunning(), and getUptime() methods
+- [x] Fixed naming conflict by renaming isRunning property to _isRunning
+- [x] TypeScript compilation successful with no errors

@@ -33,7 +33,7 @@ import { eq, and } from 'drizzle-orm';
  * MonitoringService handles the core monitoring logic
  */
 export class MonitoringService {
-  private isRunning = false;
+  private _isRunning = false;
   private monitoringInterval: NodeJS.Timeout | null = null;
   private readonly MONITORING_INTERVAL_MS = 30000; // 30 seconds
 
@@ -41,13 +41,13 @@ export class MonitoringService {
    * Start the monitoring service
    */
   async start() {
-    if (this.isRunning) {
+    if (this._isRunning) {
       console.log('[MonitoringService] Already running');
       return;
     }
 
     console.log('[MonitoringService] Starting...');
-    this.isRunning = true;
+    this._isRunning = true;
 
     // Run initial scan
     await this.runMonitoringCycle();
@@ -64,12 +64,12 @@ export class MonitoringService {
    * Stop the monitoring service
    */
   stop() {
-    if (!this.isRunning) {
+    if (!this._isRunning) {
       return;
     }
 
     console.log('[MonitoringService] Stopping...');
-    this.isRunning = false;
+    this._isRunning = false;
 
     if (this.monitoringInterval) {
       clearInterval(this.monitoringInterval);
@@ -428,6 +428,30 @@ Detected at: ${new Date().toLocaleString()}
     };
 
     await db.insert(monitoringLogs).values(logData);
+  }
+
+  /**
+   * Run a manual scan of all active regions
+   */
+  async runManualScan() {
+    console.log('[MonitoringService] Running manual scan...');
+    await this.runMonitoringCycle();
+    console.log('[MonitoringService] Manual scan completed');
+  }
+
+  /**
+   * Check if the monitoring service is running
+   */
+  isRunning(): boolean {
+    return this._isRunning;
+  }
+
+  /**
+   * Get service uptime in milliseconds
+   */
+  getUptime(): number {
+    // Simple implementation - return 0 if not running
+    return this._isRunning ? Date.now() : 0;
   }
 
   /**
